@@ -17,6 +17,10 @@ Built with Next.js, Capacitor, and Supabase.
   romance routes (Lucas / Julian / Oliver), 20 chapters, six endings
   including a secret ending that hooks into the wider Quietbind universe.
   See `docs/the-midnight-cafe-STORY-OUTLINE.md`.
+- **Crimson Masquerade** — a darker murder-mystery romance set at a
+  century-old masked ball where someone dies every year. Three romance
+  routes (Adrian / Damien / Leo), 20 chapters, six endings. See
+  `docs/crimson-masquerade-STORY-OUTLINE.md`.
 
 ## Structure
 
