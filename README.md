@@ -30,6 +30,11 @@ Built with Next.js, Capacitor, and Supabase.
   Three romance routes (Rowan / Elliot / Sebastian), 20 chapters, six
   endings. The platform's deliberately "calm" entry, contrasting the
   darker titles. See `docs/the-forgotten-garden-STORY-OUTLINE.md`.
+- **The Last Train Home** — a supernatural romance aboard a midnight train
+  that only the deeply regretful can see. Three romance routes (Asher /
+  Ryan / Daniel), 20 chapters, six endings. First story to explicitly
+  name a crossover with another Quietbind title (The Midnight Café).
+  See `docs/the-last-train-home-STORY-OUTLINE.md`.
 
 ## Structure
 
