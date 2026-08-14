@@ -1,0 +1,11 @@
+{
+  "name": "quietbind",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Quietbind — a visual novel platform. First story: Inkwell & Ivy.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  }
+}

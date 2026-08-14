@@ -1,0 +1,32 @@
+# Quietbind
+
+A visual novel platform for anime-style, story-driven romance games.
+Built with Next.js, Capacitor, and Supabase.
+
+## Stories
+
+- **Inkwell & Ivy** — a cozy café-bookshop romance with a mystery thread
+  running underneath. See `docs/inkwell-and-ivy-PLAN.md` and
+  `docs/inkwell-and-ivy-STORY-OUTLINE.md`.
+
+## Structure
+
+```
+app/                                Next.js app (story picker, player shell)
+components/                         Shared VN engine (dialogue box, choices, HUD)
+lib/stories/<story-slug>/           Chapter data per story
+public/assets/stories/<story-slug>/ Character art + backgrounds per story
+supabase/migrations/                DB schema (players, progress, unlocked_chapters)
+android/                            Capacitor Android wrapper
+docs/                               Planning docs per story
+```
+
+## Stack
+
+- Next.js (App Router) + Capacitor for Android packaging
+- Supabase for auth + save state
+- Rewarded ads (AdMob/Monetag) gate chapter unlocks
+
+## Status
+
+Early scaffold — story engine and first chapters in progress.
