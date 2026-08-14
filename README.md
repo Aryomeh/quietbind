@@ -21,6 +21,10 @@ Built with Next.js, Capacitor, and Supabase.
   century-old masked ball where someone dies every year. Three romance
   routes (Adrian / Damien / Leo), 20 chapters, six endings. See
   `docs/crimson-masquerade-STORY-OUTLINE.md`.
+- **Echoes of Tomorrow** — a time-loop romance where one girl relives the
+  same day until she meets someone else who remembers too. Three romance
+  routes (Aiden / Noah / Kai), 20 chapters, six endings. See
+  `docs/echoes-of-tomorrow-STORY-OUTLINE.md`.
 
 ## Structure
 
