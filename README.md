@@ -12,6 +12,11 @@ Built with Next.js, Capacitor, and Supabase.
   letters that predict the future, and the twenty-year-old secret behind
   them. Three romance routes (Adrian / Noah / Ethan), 20 chapters, six
   endings. See `docs/moonlight-letters-STORY-OUTLINE.md`.
+- **The Midnight Café** — a fantasy romance about a café that only exists
+  from midnight to 4 AM, open only to those carrying deep regrets. Three
+  romance routes (Lucas / Julian / Oliver), 20 chapters, six endings
+  including a secret ending that hooks into the wider Quietbind universe.
+  See `docs/the-midnight-cafe-STORY-OUTLINE.md`.
 
 ## Structure
 
