@@ -24,7 +24,7 @@ a hard constraint, see §6).
 app/                                    Next.js app (App Router)
   page.tsx                              Placeholder home page (real story picker = step 5, not built yet)
   dev/engine-preview/                   Internal route: engine sanity-check against a dummy chapter
-  dev/inkwell-ch1/                      Internal route: plays Inkwell & Ivy Ch.1 end-to-end
+  dev/inkwell/[chapter]/                Internal route: plays any written Inkwell & Ivy chapter, e.g. /dev/inkwell/1
 components/engine/                      Shared VN engine UI — BUILT
   DialogueBox.tsx, ChoiceButtons.tsx, AffectionHud.tsx, ChapterPlayer.tsx
 lib/engine/                             Engine internals — BUILT
@@ -33,8 +33,9 @@ lib/engine/                             Engine internals — BUILT
   __fixtures__/dummyChapter.ts          Test fixture, not story canon
 lib/stories/inkwell-and-ivy/            Chapter data for story #1
   manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers — BUILT
-  chapter-01.ts                         "The Bell Above the Door" — real dialogue, BUILT
-  chapters 2-20                         NOT YET WRITTEN
+  chapter-01.ts, chapter-02.ts          "The Bell Above the Door", "Two Regulars" — real dialogue, BUILT
+  chapters.ts                           Chapter-number → Chapter map, read by the dev route (and eventually the picker)
+  chapters 3-20                         NOT YET WRITTEN
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app
@@ -150,24 +151,26 @@ Ch. 1–11).
 3. ✅ **Core VN engine** — `useChapterPlayer` playback hook, `DialogueBox`,
    `ChoiceButtons`, `AffectionHud`, `ChapterPlayer`. Verified end-to-end
    against a dummy chapter at `/dev/engine-preview`.
-4. ✅ **Inkwell & Ivy Chapter 1** ("The Bell Above the Door") written as
-   real dialogue (`lib/stories/inkwell-and-ivy/chapter-01.ts`), playable
-   end-to-end at `/dev/inkwell-ch1` — dialogue, the Ch.1 affection choice,
-   and the resulting flag-gated branch line all confirmed working against
-   the real engine, not just the dummy fixture.
+4. ✅ **Inkwell & Ivy Chapter 1** ("The Bell Above the Door") and
+   **Chapter 2** ("Two Regulars") written as real dialogue
+   (`lib/stories/inkwell-and-ivy/chapter-01.ts`, `chapter-02.ts`),
+   playable end-to-end at `/dev/inkwell/1` and `/dev/inkwell/2` — a
+   dynamic dev route reading from `lib/stories/inkwell-and-ivy/chapters.ts`
+   (chapter number → Chapter map) rather than one page per chapter.
 5. ⬜ **Story picker screen** — landing page listing all 7 stories
    (Inkwell & Ivy playable, rest "coming soon"), routing into the player
    shell. Not started.
 6. ⬜ **Supabase + ad-gate** — `players` / `progress` / `unlocked_chapters`
    tables and migrations, save/resume, Chapter 4+ rewarded-ad unlock. Not
    started.
-7. ⬜ **Chapters 2–20** of Inkwell & Ivy — only Ch. 1 exists so far.
+7. ⬜ **Chapters 3–20** of Inkwell & Ivy — Ch. 1–2 done (2 of 20).
 8. ⬜ Source or generate real character art.
 9. ⬜ Package for Android via Capacitor.
 
-**Immediate next step:** step 5, the story picker screen — or continuing
-Inkwell & Ivy's chapter scripts (Ch. 2+) before building the picker UI
-around them. Either is reasonable; not yet decided which comes first.
+**Immediate next step:** continuing Inkwell & Ivy's chapter scripts
+(Ch. 3, "The Lease Letter," is next per the outline) — the story picker
+and Supabase work are still queued behind more chapter content, per the
+user's direction to keep going on chapters.
 
 ## 10. For an AI assistant continuing this project
 
