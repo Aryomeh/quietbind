@@ -8,6 +8,10 @@ Built with Next.js, Capacitor, and Supabase.
 - **Inkwell & Ivy** — a cozy café-bookshop romance with a mystery thread
   running underneath. See `docs/inkwell-and-ivy-PLAN.md` and
   `docs/inkwell-and-ivy-STORY-OUTLINE.md`.
+- **Moonlight Letters** — a full-moon mystery romance about handwritten
+  letters that predict the future, and the twenty-year-old secret behind
+  them. Three romance routes (Adrian / Noah / Ethan), 20 chapters, six
+  endings. See `docs/moonlight-letters-STORY-OUTLINE.md`.
 
 ## Structure
 
