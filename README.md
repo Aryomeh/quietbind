@@ -25,6 +25,11 @@ Built with Next.js, Capacitor, and Supabase.
   same day until she meets someone else who remembers too. Three romance
   routes (Aiden / Noah / Kai), 20 chapters, six endings. See
   `docs/echoes-of-tomorrow-STORY-OUTLINE.md`.
+- **The Forgotten Garden** — a cozy family-mystery romance about restoring
+  an abandoned estate's botanical garden and the secret it was protecting.
+  Three romance routes (Rowan / Elliot / Sebastian), 20 chapters, six
+  endings. The platform's deliberately "calm" entry, contrasting the
+  darker titles. See `docs/the-forgotten-garden-STORY-OUTLINE.md`.
 
 ## Structure
 
