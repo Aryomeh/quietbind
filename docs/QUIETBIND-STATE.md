@@ -22,10 +22,14 @@ a hard constraint, see §6).
 
 ```
 app/                                    Next.js app (App Router)
-  page.tsx                              Real story picker — lists all 7 stories, links to /play/inkwell-and-ivy/1
+  page.tsx                              App entry sequence: splash (Wobblewing Studios logo) -> simulated loading -> main menu, every open
+  stories/                              Story picker (moved here from /) — lists all 7 stories, links to /play/inkwell-and-ivy/1
+  achievements/, settings/, account/    Placeholder screens off the main menu — not wired up, UI only (account has Google/Email sign-in placeholders)
   play/inkwell-and-ivy/[chapter]/       Real player route — checks Supabase unlock status before rendering
   dev/engine-preview/                   Internal route: engine sanity-check against a dummy chapter
   dev/inkwell/[chapter]/                Internal route: plays any written Inkwell & Ivy chapter, e.g. /dev/inkwell/1
+components/menu/                        App shell UI — BUILT
+  SplashScreen.tsx, LoadingScreen.tsx, MainMenu.tsx
 components/engine/                      Shared VN engine UI — BUILT
   DialogueBox.tsx, ChoiceButtons.tsx, AffectionHud.tsx, ChapterPlayer.tsx, AdGateModal.tsx
 lib/supabase/                           Supabase integration — BUILT
@@ -197,10 +201,16 @@ Ch. 1–11).
 8. ⬜ Source or generate real character art.
 9. ⬜ Package for Android via Capacitor.
 
-**Immediate next step:** verify the real click-through flow on the Vercel
-deploy (picker → Ch.1 → complete → ad → Ch.2 unlocks and is reachable),
-then either keep writing chapters (Ch.4+, all ad-gated now that the gate
-exists) or refine the ad-gate/picker UI.
+**Immediate next step:** add the Supabase env vars to Vercel (Project
+Settings > Environment Variables — see .env.local.example for names) and
+redeploy, since the last deploy failed before they were added. Once live,
+verify the full click-through: splash -> loading -> menu -> Select Story
+-> Ch.1 -> complete -> ad -> Ch.2 unlocks. Publisher branding
+(Wobblewing Studios logo) now lives at
+public/assets/branding/wobblewing-studios-logo.png; menu, achievements,
+settings, and account screens are placeholder UI only, not wired to
+Supabase or real auth yet — Google/Email sign-in buttons on /account are
+disabled placeholders per the user's explicit request.
 
 ## 10. For an AI assistant continuing this project
 
