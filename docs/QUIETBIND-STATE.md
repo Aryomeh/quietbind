@@ -33,9 +33,9 @@ lib/engine/                             Engine internals — BUILT
   __fixtures__/dummyChapter.ts          Test fixture, not story canon
 lib/stories/inkwell-and-ivy/            Chapter data for story #1
   manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers — BUILT
-  chapter-01.ts, chapter-02.ts          "The Bell Above the Door", "Two Regulars" — real dialogue, BUILT
+  chapter-01/02/03.ts                   "The Bell Above the Door", "Two Regulars", "The Lease Letter" — BUILT (Ch.1-3, the full free tier)
   chapters.ts                           Chapter-number → Chapter map, read by the dev route (and eventually the picker)
-  chapters 3-20                         NOT YET WRITTEN
+  chapters 4-20                         NOT YET WRITTEN
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app
@@ -151,26 +151,31 @@ Ch. 1–11).
 3. ✅ **Core VN engine** — `useChapterPlayer` playback hook, `DialogueBox`,
    `ChoiceButtons`, `AffectionHud`, `ChapterPlayer`. Verified end-to-end
    against a dummy chapter at `/dev/engine-preview`.
-4. ✅ **Inkwell & Ivy Chapter 1** ("The Bell Above the Door") and
-   **Chapter 2** ("Two Regulars") written as real dialogue
-   (`lib/stories/inkwell-and-ivy/chapter-01.ts`, `chapter-02.ts`),
-   playable end-to-end at `/dev/inkwell/1` and `/dev/inkwell/2` — a
+4. ✅ **Inkwell & Ivy Chapters 1–3** — "The Bell Above the Door," "Two
+   Regulars," "The Lease Letter" — written as real dialogue
+   (`lib/stories/inkwell-and-ivy/chapter-01/02/03.ts`), playable
+   end-to-end at `/dev/inkwell/1`, `/dev/inkwell/2`, `/dev/inkwell/3` — a
    dynamic dev route reading from `lib/stories/inkwell-and-ivy/chapters.ts`
-   (chapter number → Chapter map) rather than one page per chapter.
+   (chapter number → Chapter map) rather than one page per chapter. This
+   completes the entire free tier (Ch. 1–3) end-to-end.
 5. ⬜ **Story picker screen** — landing page listing all 7 stories
    (Inkwell & Ivy playable, rest "coming soon"), routing into the player
    shell. Not started.
 6. ⬜ **Supabase + ad-gate** — `players` / `progress` / `unlocked_chapters`
    tables and migrations, save/resume, Chapter 4+ rewarded-ad unlock. Not
    started.
-7. ⬜ **Chapters 3–20** of Inkwell & Ivy — Ch. 1–2 done (2 of 20).
+7. ⬜ **Chapters 4–20** of Inkwell & Ivy — Ch. 1–3 done (3 of 20). Ch. 4
+   is the first ad-gated chapter, so it's also a natural point to pause
+   chapter-writing and build the ad-gate/Supabase layer before going
+   further — flagging that, not deciding it.
 8. ⬜ Source or generate real character art.
 9. ⬜ Package for Android via Capacitor.
 
-**Immediate next step:** continuing Inkwell & Ivy's chapter scripts
-(Ch. 3, "The Lease Letter," is next per the outline) — the story picker
-and Supabase work are still queued behind more chapter content, per the
-user's direction to keep going on chapters.
+**Immediate next step:** not yet decided — continue with Chapter 4
+("Lila's Ledger" per the outline, which is also the first ad-gated
+chapter and pairs naturally with building the ad-gate), or pivot to the
+story picker / Supabase work now that the full free tier is playable.
+Ask the user which.
 
 ## 10. For an AI assistant continuing this project
 
