@@ -22,11 +22,16 @@ a hard constraint, see §6).
 
 ```
 app/                                    Next.js app (App Router)
-  page.tsx                              Placeholder home page (real story picker = step 5, not built yet)
+  page.tsx                              Real story picker — lists all 7 stories, links to /play/inkwell-and-ivy/1
+  play/inkwell-and-ivy/[chapter]/       Real player route — checks Supabase unlock status before rendering
   dev/engine-preview/                   Internal route: engine sanity-check against a dummy chapter
   dev/inkwell/[chapter]/                Internal route: plays any written Inkwell & Ivy chapter, e.g. /dev/inkwell/1
 components/engine/                      Shared VN engine UI — BUILT
-  DialogueBox.tsx, ChoiceButtons.tsx, AffectionHud.tsx, ChapterPlayer.tsx
+  DialogueBox.tsx, ChoiceButtons.tsx, AffectionHud.tsx, ChapterPlayer.tsx, AdGateModal.tsx
+lib/supabase/                           Supabase integration — BUILT
+  client.ts                             Browser client (env-var driven)
+  device.ts                             Anonymous device-id (localStorage) + qb_players upsert
+  progress.ts                           isChapterUnlocked / unlockChapter / saveProgress
 lib/engine/                             Engine internals — BUILT
   types.ts                              Platform-wide chapter data schema (Chapter, DialogueLine, ChoiceBlock, StoryManifest...)
   player.ts                             useChapterPlayer — playback state machine (advance/choose, flags, affection, goto)
@@ -130,9 +135,18 @@ Ch. 1–11).
 
 - Next.js (App Router) + Tailwind — scaffolded and live. Capacitor not
   yet added.
-- Supabase: planned tables `players`, `progress` (per-story chapter
-  position + affection scores), `unlocked_chapters` (per-story,
-  per-chapter, unlock method) — none created yet.
+- Supabase: **shared project** — Quietbind reuses the `kid-number-adventure`
+  Supabase project (id `zymsxpehfwqmzrmcsgxa`) rather than a dedicated
+  project, since the account is capped at 2 free projects and that one had
+  the least data. Tables are prefixed `qb_` to stay separate: `qb_players`,
+  `qb_progress` (per-story chapter position, affection, flags as jsonb),
+  `qb_unlocked_chapters` (per-story, per-chapter, unlock method). Anonymous
+  device-id-based access, same RLS pattern (`anon` role, policies open by
+  device_id trust rather than `auth.uid()`) as that project's existing
+  `devices` table. Client env vars: `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY` — set in `.env.local` (gitignored) and
+  must also be added to the Vercel project's env settings for prod to work
+  (see `.env.local.example` for the var names).
 - Story content as structured TS under `lib/stories/<slug>/`, built on the
   shared schema in `lib/engine/types.ts` — pattern proven with Inkwell &
   Ivy's manifest + Chapter 1.
@@ -158,24 +172,35 @@ Ch. 1–11).
    dynamic dev route reading from `lib/stories/inkwell-and-ivy/chapters.ts`
    (chapter number → Chapter map) rather than one page per chapter. This
    completes the entire free tier (Ch. 1–3) end-to-end.
-5. ⬜ **Story picker screen** — landing page listing all 7 stories
-   (Inkwell & Ivy playable, rest "coming soon"), routing into the player
-   shell. Not started.
-6. ⬜ **Supabase + ad-gate** — `players` / `progress` / `unlocked_chapters`
-   tables and migrations, save/resume, Chapter 4+ rewarded-ad unlock. Not
-   started.
-7. ⬜ **Chapters 4–20** of Inkwell & Ivy — Ch. 1–3 done (3 of 20). Ch. 4
-   is the first ad-gated chapter, so it's also a natural point to pause
-   chapter-writing and build the ad-gate/Supabase layer before going
-   further — flagging that, not deciding it.
+5. ✅ **Story picker screen** (`app/page.tsx`) — lists all 7 stories,
+   Inkwell & Ivy links to `/play/inkwell-and-ivy/1`, the rest show
+   "Coming soon."
+6. ✅ **Supabase + ad-gate** — `qb_players` / `qb_progress` /
+   `qb_unlocked_chapters` tables live in the shared `kid-number-adventure`
+   project (see §8). Real play route at `/play/inkwell-and-ivy/[chapter]`
+   checks unlock status client-side before rendering (Ch.1 always open,
+   later chapters need a `qb_unlocked_chapters` row). `AdGateModal` is an
+   AdMob/Monetag **placeholder** — pops on chapter completion, auto-
+   dismisses after a few seconds, then `ChapterPlayer` saves progress and
+   unlocks the next chapter via Supabase. This is a stand-in for the real
+   rewarded-ad SDK (needed anyway once Capacitor/native builds happen);
+   swapping it in later is a drop-in replacement for `AdGateModal`, not a
+   rework of where it's called.
+   **Not yet verified against the live anon-key path** — the sandbox this
+   was built in can't reach Supabase's REST API (network egress doesn't
+   include Supabase hosts), so only the underlying SQL/schema was verified
+   directly, not the actual client-side `@supabase/supabase-js` + RLS
+   round-trip a real browser session would do. Worth an end-to-end click-
+   through on Vercel once deployed to confirm the ad → unlock → continue
+   flow works in a real browser.
+7. ⬜ **Chapters 4–20** of Inkwell & Ivy — Ch. 1–3 done (3 of 20).
 8. ⬜ Source or generate real character art.
 9. ⬜ Package for Android via Capacitor.
 
-**Immediate next step:** not yet decided — continue with Chapter 4
-("Lila's Ledger" per the outline, which is also the first ad-gated
-chapter and pairs naturally with building the ad-gate), or pivot to the
-story picker / Supabase work now that the full free tier is playable.
-Ask the user which.
+**Immediate next step:** verify the real click-through flow on the Vercel
+deploy (picker → Ch.1 → complete → ad → Ch.2 unlocks and is reachable),
+then either keep writing chapters (Ch.4+, all ad-gated now that the gate
+exists) or refine the ad-gate/picker UI.
 
 ## 10. For an AI assistant continuing this project
 
