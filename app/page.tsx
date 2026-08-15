@@ -1,20 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { SplashScreen } from "@/components/menu/SplashScreen";
 import { LoadingScreen } from "@/components/menu/LoadingScreen";
 import { MainMenu } from "@/components/menu/MainMenu";
 
 type Phase = "splash" | "loading" | "menu";
 
+const BOOTED_KEY = "qb_booted";
+
 /**
- * App entry sequence, shown every time the app opens: publisher splash ->
- * simulated loading -> main menu. "Select Story" from the menu goes to
- * /stories (the story picker); Achievements/Settings/Account are their
- * own routes, all placeholders except the story flow itself.
+ * App entry sequence: publisher splash -> simulated loading -> main menu.
+ * Only plays on a true first open per browser session (sessionStorage
+ * flag) — navigating back to "/" from Achievements/Settings/Account/a
+ * chapter goes straight to the menu instead of replaying the splash.
  */
 export default function Home() {
   const [phase, setPhase] = useState<Phase>("splash");
+
+  // Runs before paint, so a returning visit never visibly flashes the
+  // splash frame even though the initial render (matching SSR) is "splash".
+  useLayoutEffect(() => {
+    if (sessionStorage.getItem(BOOTED_KEY)) setPhase("menu");
+  }, []);
 
   useEffect(() => {
     if (phase !== "splash") return;
@@ -22,7 +30,12 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [phase]);
 
+  function finishLoading() {
+    sessionStorage.setItem(BOOTED_KEY, "1");
+    setPhase("menu");
+  }
+
   if (phase === "splash") return <SplashScreen />;
-  if (phase === "loading") return <LoadingScreen onDone={() => setPhase("menu")} />;
+  if (phase === "loading") return <LoadingScreen onDone={finishLoading} />;
   return <MainMenu />;
 }

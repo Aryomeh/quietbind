@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import type { Chapter, StoryCharacter } from "@/lib/engine/types";
 import { useChapterPlayer } from "@/lib/engine/player";
 import { DialogueBox } from "@/components/engine/DialogueBox";
@@ -62,6 +63,12 @@ export function ChapterPlayer({
     <div className="flex min-h-screen flex-col bg-[#14171f] px-6 py-8">
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-between gap-6">
         <div>
+          <Link
+            href="/"
+            className="mb-3 inline-flex items-center gap-1.5 text-xs text-[#e8d9b0]/40 hover:text-[#e8d9b0]/70"
+          >
+            <ArrowLeft size={14} /> Menu
+          </Link>
           <p className="text-xs uppercase tracking-[0.25em] text-[#e8d9b0]/60">
             Chapter {chapter.chapterNumber}
           </p>
