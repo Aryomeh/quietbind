@@ -25,7 +25,7 @@ export default function StoriesPage() {
               <p className="text-sm text-[#e8d9b0]/60">{story.genre}</p>
               {story.playable ? (
                 <Link
-                  href={`/play/${story.slug}/1`}
+                  href={`/stories/${story.slug}`}
                   className="mt-3 inline-block rounded-lg bg-[#caa14d] px-4 py-2 text-sm font-medium text-[#14171f]"
                 >
                   Play

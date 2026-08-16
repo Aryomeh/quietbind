@@ -90,7 +90,7 @@ export const chapter02: Chapter = {
       id: "c2-n9a",
       speaker: "ren",
       emotion: "happy",
-      text: "Ren looks entirely too pleased with himself, sliding the bag across the counter like he's won something. \"See? Good taste runs in this shop.\"",
+      text: "Ren looks far too pleased with himself, sliding the bag across the counter like he's won something. \"See? Good taste runs in this shop.\"",
       requiresFlag: "ch2LeanedRen",
     },
     {
@@ -105,7 +105,7 @@ export const chapter02: Chapter = {
       type: "dialogue",
       id: "c2-n10",
       speaker: "narrator",
-      text: "Somewhere between the arguing and the coffee finally brewing, the shop starts to feel less like a room full of Lila's things and more like a room two people have quietly decided is worth showing up to. You're starting to understand why.",
+      text: "Somewhere between the arguing and the coffee finally brewing, this stops feeling like Lila's shop and starts feeling like somewhere these two just happen to show up. You're starting to understand why.",
     },
   ],
 };

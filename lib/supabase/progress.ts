@@ -40,6 +40,49 @@ export async function unlockChapter(
   if (error) console.error("unlockChapter error", error);
 }
 
+/** All chapter numbers this device has unlocked for a story (via qb_unlocked_chapters), used to build the chapter picker's lock/unlock state in one query instead of one per chapter. Chapter 1 is always implicitly unlocked and isn't stored as a row, so it's added here regardless of what's in the DB. */
+export async function getUnlockedChapters(
+  deviceId: string,
+  storySlug: string
+): Promise<Set<number>> {
+  const unlocked = new Set<number>([1]);
+  if (!deviceId) return unlocked;
+
+  const { data, error } = await supabase
+    .from("qb_unlocked_chapters")
+    .select("chapter_number")
+    .eq("device_id", deviceId)
+    .eq("story_slug", storySlug);
+
+  if (error) {
+    console.error("getUnlockedChapters error", error);
+    return unlocked;
+  }
+  for (const row of data ?? []) unlocked.add(row.chapter_number);
+  return unlocked;
+}
+
+/** The chapter this device most recently saved progress on for a story — used for the picker's "Continue" shortcut. Null if they've never played this story. */
+export async function getLastReadChapter(
+  deviceId: string,
+  storySlug: string
+): Promise<number | null> {
+  if (!deviceId) return null;
+
+  const { data, error } = await supabase
+    .from("qb_progress")
+    .select("chapter_number")
+    .eq("device_id", deviceId)
+    .eq("story_slug", storySlug)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getLastReadChapter error", error);
+    return null;
+  }
+  return data?.chapter_number ?? null;
+}
+
 export async function saveProgress(
   deviceId: string,
   storySlug: string,

@@ -45,7 +45,7 @@ export const chapter03: Chapter = {
       id: "c3-n5",
       speaker: "kai",
       emotion: "serious",
-      text: "Kai reads it over your shoulder without asking, which somehow doesn't feel like an intrusion. \"Thorne Holdings. They've been buying up this side of town for two years now.\"",
+      text: "Kai reads it over your shoulder without asking. It doesn't feel like an intrusion, not from him. \"Thorne Holdings. They've been buying up this side of town for two years now.\"",
     },
     {
       type: "dialogue",
@@ -78,7 +78,7 @@ export const chapter03: Chapter = {
       id: "c3-n7a",
       speaker: "kai",
       emotion: "neutral",
-      text: "He doesn't offer easy reassurance, which somehow helps more than if he had. \"I know a few names. People who've dealt with this before. We'll figure out what leverage you actually have.\"",
+      text: "He doesn't offer easy reassurance. It helps more than if he had. \"I know a few names. People who've dealt with this before. We'll figure out what leverage you actually have.\"",
       requiresFlag: "ch3LeanedKai",
     },
     {
@@ -93,7 +93,7 @@ export const chapter03: Chapter = {
       type: "dialogue",
       id: "c3-n8",
       speaker: "narrator",
-      text: "Whatever this morning was supposed to be, it isn't that anymore. The shop still smells like coffee and old paper, but the letter sits on the counter now like it's not planning on being ignored.",
+      text: "Whatever this morning was supposed to be, it's not that anymore. The shop still smells like coffee and old paper, but the letter sits on the counter now, impossible to ignore.",
     },
   ],
 };

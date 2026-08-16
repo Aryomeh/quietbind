@@ -81,39 +81,44 @@ export function ChapterPlayer({
 
         <AffectionHud characters={characters} affection={affection} />
 
-        <div className="flex-1" />
+        <div className="flex flex-1 flex-col justify-end gap-6">
+          {isComplete && adPhase === "done" && (
+            <div className="rounded-2xl border border-[#caa14d]/30 bg-[#f6ecd6] px-6 py-8 text-center shadow-lg">
+              <p className="font-semibold text-[#241d12]">End of chapter.</p>
+              {hasNextChapter ? (
+                <Link
+                  href={`/play/${chapter.storySlug}/${chapter.chapterNumber + 1}`}
+                  className="mt-4 inline-block rounded-lg bg-[#241d12] px-4 py-2 text-sm font-medium text-[#f6ecd6]"
+                >
+                  Continue to Chapter {chapter.chapterNumber + 1}
+                </Link>
+              ) : (
+                <p className="mt-3 text-sm text-[#5b5138]">More chapters coming soon.</p>
+              )}
+            </div>
+          )}
 
-        {isComplete && adPhase === "done" && (
-          <div className="rounded-2xl border border-[#caa14d]/30 bg-[#f6ecd6] px-6 py-8 text-center shadow-lg">
-            <p className="font-semibold text-[#241d12]">End of chapter.</p>
-            {hasNextChapter ? (
-              <Link
-                href={`/play/${chapter.storySlug}/${chapter.chapterNumber + 1}`}
-                className="mt-4 inline-block rounded-lg bg-[#241d12] px-4 py-2 text-sm font-medium text-[#f6ecd6]"
-              >
-                Continue to Chapter {chapter.chapterNumber + 1}
-              </Link>
-            ) : (
-              <p className="mt-3 text-sm text-[#5b5138]">More chapters coming soon.</p>
-            )}
-          </div>
-        )}
+          {currentNode?.type === "dialogue" && (
+            <>
+              <CharacterStage
+                storySlug={chapter.storySlug}
+                speaker={currentNode.speaker}
+                emotion={currentNode.emotion}
+                characters={characters}
+              />
+              <DialogueBox
+                line={currentNode}
+                characters={characters}
+                onAdvance={advance}
+                fill={currentNode.speaker === "narrator"}
+              />
+            </>
+          )}
 
-        {currentNode?.type === "dialogue" && (
-          <>
-            <CharacterStage
-              storySlug={chapter.storySlug}
-              speaker={currentNode.speaker}
-              emotion={currentNode.emotion}
-              characters={characters}
-            />
-            <DialogueBox line={currentNode} characters={characters} onAdvance={advance} />
-          </>
-        )}
-
-        {currentNode?.type === "choice" && (
-          <ChoiceButtons choice={currentNode} onChoose={choose} />
-        )}
+          {currentNode?.type === "choice" && (
+            <ChoiceButtons choice={currentNode} onChoose={choose} />
+          )}
+        </div>
       </div>
 
       {adPhase === "showing" && <AdGateModal onComplete={() => setAdPhase("done")} />}

@@ -92,7 +92,7 @@ export const chapter01: Chapter = {
       type: "dialogue",
       id: "c1-n8",
       speaker: "narrator",
-      text: "You step inside. Dust hangs in the morning light over the shelves, the register, the little reading nook by the window. For the first time in weeks, the shop feels less like something you inherited and more like somewhere you could stand to be.",
+      text: "You step inside. Dust hangs in the morning light over the shelves, the register, the little reading nook by the window. For the first time in weeks, the shop feels like somewhere you could actually stand to be.",
       background: "shop-interior-morning",
     },
   ],
