@@ -12,6 +12,8 @@ import { CharacterStage } from "@/components/engine/CharacterStage";
 import { AdGateModal } from "@/components/engine/AdGateModal";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
 import { saveProgress, unlockChapter } from "@/lib/supabase/progress";
+import { audioManager } from "@/lib/audio/AudioManager";
+import { getBgmForChapter, SFX } from "@/lib/audio/assets";
 
 interface ChapterPlayerProps {
   chapter: Chapter;
@@ -59,6 +61,21 @@ export function ChapterPlayer({
   }, [adPhase]);
 
   const background = currentNode?.type === "dialogue" ? currentNode.background : undefined;
+
+  useEffect(() => {
+    const bgmSrc = getBgmForChapter(chapter.storySlug, chapter.chapterNumber, background);
+    if (bgmSrc) {
+      audioManager.playBgm(`${chapter.storySlug}:${background ?? "default"}:${chapter.chapterNumber}`, bgmSrc);
+    }
+  }, [background, chapter.storySlug, chapter.chapterNumber]);
+
+  useEffect(() => {
+    if (isComplete) audioManager.playSfx(SFX.chapterComplete);
+  }, [isComplete]);
+
+  useEffect(() => {
+    if (adPhase === "done") audioManager.playSfx(SFX.adGateUnlock);
+  }, [adPhase]);
 
   return (
     <div className="flex min-h-screen flex-col bg-[#14171f] px-6 py-8">
