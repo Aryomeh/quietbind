@@ -1,6 +1,11 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BookOpen, Trophy, Settings, UserCircle } from "lucide-react";
+import { audioManager } from "@/lib/audio/AudioManager";
+import { MENU_BGM } from "@/lib/audio/assets";
 
 const menuItems = [
   {
@@ -34,6 +39,10 @@ const menuItems = [
 ];
 
 export function MainMenu() {
+  useEffect(() => {
+    audioManager.playBgm("menu", MENU_BGM);
+  }, []);
+
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-[#0d0f16] px-6 py-14 text-[#e8d9b0]">
       {/* soft radial glow behind everything */}
