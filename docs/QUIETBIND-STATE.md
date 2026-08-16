@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-16 (character art backgrounds removed) · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-16 (dialogue layout, art re-cutout, chapter picker, prose pass — merged with audio system) · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -223,14 +223,44 @@ Ch. 1–11).
    live in Ch. 2 (visible white box behind Kai's portrait), fixed same
    day. Not yet needed: Thorne/Elias art (no dialogue until Ch. 13+), or
    wider emotion coverage for Kai/Ren's later route-lock chapters (Ch. 12+).
-9. ⬜ Audio/music system — not started. Planned: `music`/`sfx` fields on
-   the chapter schema, an `AudioManager` under `lib/audio/`, asset
-   convention `public/assets/stories/<slug>/audio/{bgm,sfx}/`, same
-   placeholder-first approach (silently no-ops until real files exist).
+9. ✅ **Audio/music system** — landed via a separate work session merged
+   into this branch: `lib/audio/AudioManager.ts`, `lib/audio/assets.ts`
+   (BGM-per-chapter/background + SFX registry), `useAudioSettings` hook,
+   settings-screen mute/volume toggles, and the first real audio batch
+   (4 BGM tracks + 4 SFX) for Inkwell & Ivy under
+   `public/assets/stories/inkwell-and-ivy/audio/{bgm,sfx}/`. Wired into
+   `ChapterPlayer` (BGM keyed on scene background, SFX on chapter
+   complete + ad-gate unlock).
 10. ✅ Source real character art for Kai/Ren/Priya — done, see step 8.
    ⬜ Still need: Thorne/Elias art (once they get dialogue, Ch.13+), and
    wider Kai/Ren emotion coverage for route-lock chapters (Ch.12+).
 11. ⬜ Package for Android via Capacitor.
+12. ✅ **Post-launch fixes from first real playtest feedback:**
+   - Dialogue card no longer leaves a large empty gap on narrator-only
+     lines (no portrait) — `DialogueBox` takes a `fill` prop that lets it
+     grow to fill the space up to the affection bar; stays compact below
+     the portrait whenever one is shown.
+   - Character art background removal redone — 3 of the first 13 files
+     (`kai/happy`, `kai/neutral`/`sad`, `priya/happy`) had failed cutouts
+     from `rembg`'s default model on soft-gradient source images,
+     leaving a hazy semi-transparent fringe that looked like the
+     character was blending into the dark app background. Reprocessed
+     with `isnet-general-use` + alpha matting. Separately, all 13 files
+     had zero padding (hair/shoulders touching the raw canvas edge),
+     which read as an inconsistent "crop" once scaled into the portrait
+     frame — normalized every file to a uniform 6% margin.
+   - New chapter picker at `/stories/inkwell-and-ivy` — lists every
+     written chapter with lock/unlock state (via new
+     `getUnlockedChapters` / `getLastReadChapter` in
+     `lib/supabase/progress.ts`) and a "Continue" shortcut to the
+     furthest chapter reached. `/stories` "Play" button now routes here
+     instead of hardcoding Chapter 1.
+   - Prose pass on Ch. 1–3 to remove repeated AI-sounding phrasing: a
+     "less like X, more like Y" closing-line template that appeared
+     verbatim-structured in both Ch.1 and Ch.2, doubled-up "somehow"
+     hedges in Ch.3, and an inanimate-object-with-intent cliché
+     ("like it's not planning on being ignored"). Only `text` fields
+     changed — no ids/flags/choice logic touched.
 
 **Immediate next step:** app is live and confirmed reachable at
 https://quietbind-git-main-aryomehs-projects.vercel.app/ (Vercel
