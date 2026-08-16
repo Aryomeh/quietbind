@@ -13,7 +13,21 @@ import type { CharacterId, Emotion } from "./types";
  * `"<characterId>:<emotion>"` to that story's set below.
  */
 const AVAILABLE_ART: Record<string, Set<string>> = {
-  // "inkwell-and-ivy": new Set(["kai:neutral", "kai:happy"]),
+  "inkwell-and-ivy": new Set([
+    "kai:blushing",
+    "kai:neutral",
+    "kai:happy",
+    "kai:serious",
+    "kai:annoyed",
+    "kai:sad", // reusing neutral.png as a stand-in — swap for a real "sad" generation later
+    "ren:blushing",
+    "ren:neutral",
+    "ren:happy",
+    "ren:annoyed",
+    "ren:sad",
+    "priya:neutral",
+    "priya:happy",
+  ]),
 };
 
 export function characterArtPath(

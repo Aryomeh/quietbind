@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-16 (character art plumbing) · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-16 (real character art: Kai, Ren, Priya) · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -204,26 +204,29 @@ Ch. 1–11).
    through on Vercel once deployed to confirm the ad → unlock → continue
    flow works in a real browser.
 7. ⬜ **Chapters 4–20** of Inkwell & Ivy — Ch. 1–3 done (3 of 20).
-8. ✅ **Character art plumbing** — `lib/engine/characterArt.ts` holds a
-   per-story registry (`AVAILABLE_ART`) mapping `"characterId:emotion"`
+8. ✅ **Character art plumbing + first real art** — `lib/engine/characterArt.ts`
+   holds a per-story registry (`AVAILABLE_ART`) mapping `"characterId:emotion"`
    keys to real art files at
    `public/assets/stories/<slug>/characters/<characterId>/<emotion>.png`.
-   New `CharacterStage` component renders above the dialogue box for
-   every dialogue line with a non-narrator speaker: shows the real image
-   if the story/character/emotion is registered, otherwise a placeholder
-   card (initial + name + emotion tag) — same "structurally real,
-   visually a placeholder" pattern as `AdGateModal`. Wired into
-   `ChapterPlayer` for both `/play/...` and the `/dev/...` routes (single
-   call site). **Not yet done:** no real character art exists for any
-   story — `AVAILABLE_ART` is empty, so every character currently shows
-   the placeholder card. Adding art later = drop the file in the asset
-   folder + add one entry to the registry, no component changes needed.
+   `CharacterStage` component renders above the dialogue box for every
+   dialogue line with a non-narrator speaker: real image if registered,
+   otherwise a placeholder card (initial + name + emotion tag). Wired into
+   `ChapterPlayer` for both `/play/...` and `/dev/...` routes (single call
+   site). **Real art now in for all 3 speaking characters so far:** Kai
+   (blushing, neutral, happy, serious, annoyed, sad — sad is a reused copy
+   of neutral.png as a stand-in, flagged in the registry, swap when a real
+   one is generated), Ren (blushing, neutral, happy, annoyed, sad), Priya
+   (neutral, happy) — 13 files total. This fully covers Ch. 1–3 (written)
+   plus the emotion range expected through Ch. 11 per the story outline.
+   Not yet needed: Thorne/Elias art (no dialogue until Ch. 13+), or wider
+   emotion coverage for Kai/Ren's later route-lock chapters (Ch. 12+).
 9. ⬜ Audio/music system — not started. Planned: `music`/`sfx` fields on
    the chapter schema, an `AudioManager` under `lib/audio/`, asset
    convention `public/assets/stories/<slug>/audio/{bgm,sfx}/`, same
    placeholder-first approach (silently no-ops until real files exist).
-10. ⬜ Source or generate real character art (the actual image files —
-   distinct from the plumbing in step 8, which is done).
+10. ✅ Source real character art for Kai/Ren/Priya — done, see step 8.
+   ⬜ Still need: Thorne/Elias art (once they get dialogue, Ch.13+), and
+   wider Kai/Ren emotion coverage for route-lock chapters (Ch.12+).
 11. ⬜ Package for Android via Capacitor.
 
 **Immediate next step:** app is live and confirmed reachable at
