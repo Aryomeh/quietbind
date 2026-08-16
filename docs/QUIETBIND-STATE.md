@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-16 · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-16 (ad waterfall) · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -183,13 +183,19 @@ Ch. 1–11).
    `qb_unlocked_chapters` tables live in the shared `kid-number-adventure`
    project (see §8). Real play route at `/play/inkwell-and-ivy/[chapter]`
    checks unlock status client-side before rendering (Ch.1 always open,
-   later chapters need a `qb_unlocked_chapters` row). `AdGateModal` is an
-   AdMob/Monetag **placeholder** — pops on chapter completion, auto-
-   dismisses after a few seconds, then `ChapterPlayer` saves progress and
-   unlocks the next chapter via Supabase. This is a stand-in for the real
-   rewarded-ad SDK (needed anyway once Capacitor/native builds happen);
-   swapping it in later is a drop-in replacement for `AdGateModal`, not a
-   rework of where it's called.
+   later chapters need a `qb_unlocked_chapters` row). `AdGateModal` runs
+   a **placeholder ad waterfall** via `lib/ads/adService.ts`
+   (`runRewardedAdWaterfall`): tries AdMob first, falls back to Monetag
+   if AdMob fails to load/fill. Both networks are placeholders for now
+   (always "succeed" after a countdown), so only the AdMob branch runs
+   in practice today — the Monetag fallback branch starts exercising
+   itself once the real AdMob SDK is wired in and can actually reject on
+   no-fill. Pops on chapter completion, auto-dismisses after a few
+   seconds, then `ChapterPlayer` saves progress and unlocks the next
+   chapter via Supabase. This is a stand-in for the real rewarded-ad
+   SDKs (needed anyway once Capacitor/native builds happen); swapping in
+   real AdMob/Monetag zone/app IDs later is a change inside
+   `adService.ts` only, not a rework of `AdGateModal` or its call sites.
    **Not yet verified against the live anon-key path** — the sandbox this
    was built in can't reach Supabase's REST API (network egress doesn't
    include Supabase hosts), so only the underlying SQL/schema was verified
