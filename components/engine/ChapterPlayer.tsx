@@ -8,6 +8,7 @@ import { useChapterPlayer } from "@/lib/engine/player";
 import { DialogueBox } from "@/components/engine/DialogueBox";
 import { ChoiceButtons } from "@/components/engine/ChoiceButtons";
 import { AffectionHud } from "@/components/engine/AffectionHud";
+import { CharacterStage } from "@/components/engine/CharacterStage";
 import { AdGateModal } from "@/components/engine/AdGateModal";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
 import { saveProgress, unlockChapter } from "@/lib/supabase/progress";
@@ -99,7 +100,15 @@ export function ChapterPlayer({
         )}
 
         {currentNode?.type === "dialogue" && (
-          <DialogueBox line={currentNode} characters={characters} onAdvance={advance} />
+          <>
+            <CharacterStage
+              storySlug={chapter.storySlug}
+              speaker={currentNode.speaker}
+              emotion={currentNode.emotion}
+              characters={characters}
+            />
+            <DialogueBox line={currentNode} characters={characters} onAdvance={advance} />
+          </>
         )}
 
         {currentNode?.type === "choice" && (
