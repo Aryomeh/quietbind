@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-16 (real character art: Kai, Ren, Priya) · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-16 (character art backgrounds removed) · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -218,8 +218,11 @@ Ch. 1–11).
    one is generated), Ren (blushing, neutral, happy, annoyed, sad), Priya
    (neutral, happy) — 13 files total. This fully covers Ch. 1–3 (written)
    plus the emotion range expected through Ch. 11 per the story outline.
-   Not yet needed: Thorne/Elias art (no dialogue until Ch. 13+), or wider
-   emotion coverage for Kai/Ren's later route-lock chapters (Ch. 12+).
+   All 13 have transparent (alpha-channel) backgrounds via `rembg` —
+   the first upload batch had opaque white/gradient backgrounds, caught
+   live in Ch. 2 (visible white box behind Kai's portrait), fixed same
+   day. Not yet needed: Thorne/Elias art (no dialogue until Ch. 13+), or
+   wider emotion coverage for Kai/Ren's later route-lock chapters (Ch. 12+).
 9. ⬜ Audio/music system — not started. Planned: `music`/`sfx` fields on
    the chapter schema, an `AudioManager` under `lib/audio/`, asset
    convention `public/assets/stories/<slug>/audio/{bgm,sfx}/`, same
