@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-14 · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-16 · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -22,10 +22,10 @@ a hard constraint, see §6).
 
 ```
 app/                                    Next.js app (App Router)
-  page.tsx                              App entry sequence: splash (Wobblewing Studios logo) -> simulated loading -> main menu, every open
+  page.tsx                              App entry sequence: splash (Wobblewing Studios logo) -> ~8s simulated loading (stalls at 50%/80%) -> main menu. Skips splash/loading on return trips to "/" via a sessionStorage flag — only plays on true first open per browser session.
   stories/                              Story picker (moved here from /) — lists all 7 stories, links to /play/inkwell-and-ivy/1
-  achievements/, settings/, account/    Placeholder screens off the main menu — not wired up, UI only (account has Google/Email sign-in placeholders)
-  play/inkwell-and-ivy/[chapter]/       Real player route — checks Supabase unlock status before rendering
+  achievements/, settings/, account/    Placeholder screens off the main menu — not wired up, UI only (account has Google/Email sign-in placeholders); each has a "← Menu" back link
+  play/inkwell-and-ivy/[chapter]/       Real player route — checks Supabase unlock status before rendering; ChapterPlayer now also has a "← Menu" back link
   dev/engine-preview/                   Internal route: engine sanity-check against a dummy chapter
   dev/inkwell/[chapter]/                Internal route: plays any written Inkwell & Ivy chapter, e.g. /dev/inkwell/1
 components/menu/                        App shell UI — BUILT
@@ -201,16 +201,19 @@ Ch. 1–11).
 8. ⬜ Source or generate real character art.
 9. ⬜ Package for Android via Capacitor.
 
-**Immediate next step:** add the Supabase env vars to Vercel (Project
-Settings > Environment Variables — see .env.local.example for names) and
-redeploy, since the last deploy failed before they were added. Once live,
-verify the full click-through: splash -> loading -> menu -> Select Story
--> Ch.1 -> complete -> ad -> Ch.2 unlocks. Publisher branding
-(Wobblewing Studios logo) now lives at
-public/assets/branding/wobblewing-studios-logo.png; menu, achievements,
-settings, and account screens are placeholder UI only, not wired to
-Supabase or real auth yet — Google/Email sign-in buttons on /account are
-disabled placeholders per the user's explicit request.
+**Immediate next step:** app is live and confirmed reachable at
+https://quietbind-git-main-aryomehs-projects.vercel.app/ (Vercel
+Deployment Protection was initially blocking outside access — user
+disabled/adjusted it; if it stops being reachable again, check that
+setting first). Two UX bugs reported after first live testing were fixed
+(back-to-menu link in the chapter reader; splash/loading no longer
+replays on back-navigation to "/"; loading bar retimed to ~8s with
+stalls). **Not yet done:** a real click-through of the ad-gate ->
+Supabase unlock -> Chapter 2 sequence hasn't been explicitly confirmed
+working by the user — worth asking about specifically. After that,
+either more chapters (Ch.4+, all ad-gated) or further polish (e.g. wiring
+real progress into the Achievements screen instead of the all-locked
+placeholder).
 
 ## 10. For an AI assistant continuing this project
 
