@@ -20,7 +20,7 @@ export const chapter04: Chapter = {
       type: "dialogue",
       id: "c4-n1",
       speaker: "narrator",
-      text: "The register drawer sticks the same way the front door does, which is how you find the ledger — wedged behind it, jammed there long enough that the leather cover has taken on the drawer's shape.",
+      text: "The register drawer sticks the same way the front door does, which is how you find the ledger, wedged behind it, jammed there long enough that the leather cover has taken on the drawer's shape.",
       background: "shop-interior-morning",
     },
     {
@@ -33,7 +33,7 @@ export const chapter04: Chapter = {
       type: "dialogue",
       id: "c4-n3",
       speaker: "narrator",
-      text: "Then the entries start doing something else. \"K. — same page again.\" A few weeks later: \"R. brought the good ones today. Didn't tell him why I kept the last batch.\" No explanation attached to either. Lila clearly didn't think she'd need one.",
+      text: "Then the entries start doing something else. \"K. Same page again.\" A few weeks later: \"R. brought the good ones today. Didn't tell him why I kept the last batch.\" No explanation attached to either. Lila clearly didn't think she'd need one.",
     },
     {
       type: "dialogue",
@@ -105,7 +105,7 @@ export const chapter04: Chapter = {
       id: "c4-n10b",
       speaker: "priya",
       emotion: "happy",
-      text: "Priya laughs, but it's fonder than it is amused. \"Ren's family recipe. She'd only ever take the ugly, lopsided ones off his hands — said the good-looking batch was for paying customers. He never once questioned why she wanted the rejects.\"",
+      text: "Priya laughs, but it's fonder than it is amused. \"Ren's family recipe. She'd only ever take the ugly, lopsided ones off his hands. Said the good-looking batch was for paying customers. He never once questioned why she wanted the rejects.\"",
       requiresFlag: "ch4LeanedRen",
     },
     {
@@ -118,7 +118,7 @@ export const chapter04: Chapter = {
       type: "dialogue",
       id: "c4-n12",
       speaker: "narrator",
-      text: "Later, alone, you're sorting through a stack of returned books when a folded slip of paper slides out from between the pages — not a bookmark, not anything that looks like it belongs to a customer.",
+      text: "Later, alone, you're sorting through a stack of returned books when a folded slip of paper slides out from between the pages, not a bookmark, not anything that looks like it belongs to a customer.",
       background: "shop-interior-morning",
     },
     {

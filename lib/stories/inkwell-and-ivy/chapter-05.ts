@@ -55,7 +55,7 @@ export const chapter05: Chapter = {
       options: [
         {
           id: "strategic",
-          text: "\"Let's be smart about it — make the booth about what this shop actually does well, and let that speak for itself.\"",
+          text: "\"Let's be smart about it: make the booth about what this shop actually does well, and let that speak for itself.\"",
           affectionDelta: { kai: 2 },
           setsFlag: "ch5LeanedKai",
         },
