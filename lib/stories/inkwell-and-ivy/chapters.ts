@@ -8,6 +8,7 @@ import { chapter06 } from "@/lib/stories/inkwell-and-ivy/chapter-06";
 import { chapter07 } from "@/lib/stories/inkwell-and-ivy/chapter-07";
 import { chapter08 } from "@/lib/stories/inkwell-and-ivy/chapter-08";
 import { chapter09 } from "@/lib/stories/inkwell-and-ivy/chapter-09";
+import { chapter10 } from "@/lib/stories/inkwell-and-ivy/chapter-10";
 
 /**
  * All Inkwell & Ivy chapters written so far, keyed by chapter number.
@@ -24,4 +25,5 @@ export const inkwellAndIvyChapters: Record<number, Chapter> = {
   7: chapter07,
   8: chapter08,
   9: chapter09,
+  10: chapter10,
 };

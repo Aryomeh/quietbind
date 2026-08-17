@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-16 (dialogue layout, art re-cutout, chapter picker, prose pass — merged with audio system) · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-17 (audio settings toggles, Ch.4–10 written, em-dash cleanup) · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -42,9 +42,9 @@ lib/engine/                             Engine internals — BUILT
   __fixtures__/dummyChapter.ts          Test fixture, not story canon
 lib/stories/inkwell-and-ivy/            Chapter data for story #1
   manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers — BUILT
-  chapter-01/02/03.ts                   "The Bell Above the Door", "Two Regulars", "The Lease Letter" — BUILT (Ch.1-3, the full free tier)
+  chapter-01 through chapter-10.ts       "The Bell Above the Door" through "The Key" — BUILT (Ch.1-10 of 20, half done)
   chapters.ts                           Chapter-number → Chapter map, read by the dev route (and eventually the picker)
-  chapters 4-20                         NOT YET WRITTEN
+  chapters 11-20                        NOT YET WRITTEN — Ch.11 is the route-split chapter
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app
@@ -203,7 +203,17 @@ Ch. 1–11).
    round-trip a real browser session would do. Worth an end-to-end click-
    through on Vercel once deployed to confirm the ad → unlock → continue
    flow works in a real browser.
-7. ⬜ **Chapters 4–20** of Inkwell & Ivy — Ch. 1–3 done (3 of 20).
+7. 🔶 **Chapters 4–20** of Inkwell & Ivy — Ch. 1–10 done (10 of 20, exactly
+   half). Ch.4 "Lila's Ledger" (introduces Priya, first mystery-thread
+   note), Ch.5 "Festival Announcement" (community-rallying beat), Ch.6
+   "Coffee and Confessions" (Kai-focused one-on-one, poetry-shelf origin),
+   Ch.7 "Flour on the Counter" (Ren-focused one-on-one, Thorne/bakery
+   backstory), Ch.8 "The Locked Drawer" (torn photo corner, second-lock
+   hint), Ch.9 "Festival Prep" (group chapter; the Kai/Ren choice here is
+   the Ch.11 route-split tiebreaker), Ch.10 "The Key" (drawer opens,
+   diagram of a second door behind the poetry shelf). All ad-gated
+   (`freeTier: false`), all follow the Ch.1-3 flag convention
+   (`ch{N}Leaned{Kai|Ren}`). Next up: Ch.11, the actual route split.
 8. ✅ **Character art plumbing + first real art** — `lib/engine/characterArt.ts`
    holds a per-story registry (`AVAILABLE_ART`) mapping `"characterId:emotion"`
    keys to real art files at
@@ -231,6 +241,17 @@ Ch. 1–11).
    `public/assets/stories/inkwell-and-ivy/audio/{bgm,sfx}/`. Wired into
    `ChapterPlayer` (BGM keyed on scene background, SFX on chapter
    complete + ad-gate unlock).
+9b. ✅ **Music/Sound Effects settings toggles** — Settings page now has
+   real on/off switches for Music and Sound Effects (previously
+   placeholder rows), backed by `AudioManager`'s persisted
+   `musicEnabled`/`sfxEnabled` state (localStorage, survives reload).
+   Bgm keeps playing across menu/settings/achievements navigation since
+   `AudioManager` is a singleton outside the React tree; only
+   `ChapterPlayer` explicitly switches tracks. Known scoping gap: Ch.3's
+   tension bgm variant is selected via a chapter-number special case in
+   `getBgmForChapter` rather than a real mood field on `Chapter`, since
+   the schema doesn't have one yet — fine for now, worth revisiting if
+   more chapters need a tonal music shift without a background change.
 10. ✅ Source real character art for Kai/Ren/Priya — done, see step 8.
    ⬜ Still need: Thorne/Elias art (once they get dialogue, Ch.13+), and
    wider Kai/Ren emotion coverage for route-lock chapters (Ch.12+).
@@ -271,10 +292,30 @@ setting first). Two UX bugs reported after first live testing were fixed
 replays on back-navigation to "/"; loading bar retimed to ~8s with
 stalls). **Not yet done:** a real click-through of the ad-gate ->
 Supabase unlock -> Chapter 2 sequence hasn't been explicitly confirmed
-working by the user — worth asking about specifically. After that,
-either more chapters (Ch.4+, all ad-gated) or further polish (e.g. wiring
-real progress into the Achievements screen instead of the all-locked
-placeholder).
+working by the user — worth asking about specifically.
+
+Story writing is now the main active thread: Ch.1-10 of 20 are done
+(exactly halfway to the Ch.11 route split). Next chapter to write is
+**Ch.11 "The Choice"** — the actual route-split chapter, branching to
+`route: "kai"` or `route: "ren"` based on total affection (tiebreaker:
+the Ch.9 festival-prep choice flag). This is a bigger lift than Ch.4-10
+since it needs the branch logic itself (not just flag-gated dialogue
+lines within one linear chapter) — check how `player.ts` and
+`ChapterPlayer` currently resolve `route` before writing it, since nothing
+route-specific has been built yet.
+
+**Style notes for any AI writing chapter text**, learned mid-session:
+- No em-dashes ("—") in any `text` field the player will see. Use
+  periods, commas, or colons instead. (Code comments are fine, players
+  never see those.) This was flagged directly by the user after seeing
+  it rendered in Ch.4 — checked and fixed in Ch.4-10 since; Ch.1-3 were
+  explicitly left untouched per the user's instruction not to touch
+  chapters written by someone else.
+- The player never gets a `speaker: "player"` dialogue line — their
+  voice comes through narrator prose (second person) or the choice
+  options themselves only. `DialogueBox` would render an ugly raw
+  "PLAYER" label if this slips through since "player" isn't in any
+  story's character roster.
 
 ## 10. For an AI assistant continuing this project
 
