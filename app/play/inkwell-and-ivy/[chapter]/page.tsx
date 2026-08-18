@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChapterPlayer } from "@/components/engine/ChapterPlayer";
 import { inkwellAndIvyChapters } from "@/lib/stories/inkwell-and-ivy/chapters";
-import { inkwellAndIvyManifest } from "@/lib/stories/inkwell-and-ivy/manifest";
+import { inkwellAndIvyManifest, inkwellAndIvyRouteSplit } from "@/lib/stories/inkwell-and-ivy/manifest";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
-import { isChapterUnlocked } from "@/lib/supabase/progress";
+import { isChapterUnlocked, getProgress, type SavedProgress } from "@/lib/supabase/progress";
 import { getSession } from "@/lib/supabase/auth";
 
 type Status = "loading" | "locked" | "unlocked";
@@ -18,6 +18,7 @@ export default function PlayInkwellChapterPage() {
   const chapter = inkwellAndIvyChapters[chapterNumber];
 
   const [status, setStatus] = useState<Status>("loading");
+  const [progress, setProgress] = useState<SavedProgress | null>(null);
 
   useEffect(() => {
     if (!chapter) return;
@@ -27,8 +28,13 @@ export default function PlayInkwellChapterPage() {
       const session = await getSession();
       const userId = session?.user?.id ?? null;
       await ensurePlayer(deviceId, userId);
-      const unlocked = await isChapterUnlocked(deviceId, chapter.storySlug, chapter.chapterNumber, userId);
-      if (!cancelled) setStatus(unlocked ? "unlocked" : "locked");
+      const [unlocked, saved] = await Promise.all([
+        isChapterUnlocked(deviceId, chapter.storySlug, chapter.chapterNumber, userId),
+        getProgress(deviceId, chapter.storySlug, userId),
+      ]);
+      if (cancelled) return;
+      setProgress(saved);
+      setStatus(unlocked ? "unlocked" : "locked");
     })();
     return () => {
       cancelled = true;
@@ -75,7 +81,10 @@ export default function PlayInkwellChapterPage() {
     <ChapterPlayer
       chapter={chapter}
       characters={inkwellAndIvyManifest.characters}
+      initialAffection={progress?.affection}
+      initialFlags={progress?.flags}
       hasNextChapter={!!inkwellAndIvyChapters[chapterNumber + 1]}
+      routeSplit={inkwellAndIvyRouteSplit}
     />
   );
 }

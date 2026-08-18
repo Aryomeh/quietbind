@@ -9,11 +9,18 @@ import { chapter07 } from "@/lib/stories/inkwell-and-ivy/chapter-07";
 import { chapter08 } from "@/lib/stories/inkwell-and-ivy/chapter-08";
 import { chapter09 } from "@/lib/stories/inkwell-and-ivy/chapter-09";
 import { chapter10 } from "@/lib/stories/inkwell-and-ivy/chapter-10";
+import { chapter11 } from "@/lib/stories/inkwell-and-ivy/chapter-11";
 
 /**
  * All Inkwell & Ivy chapters written so far, keyed by chapter number.
  * Add new chapters here as they're written — this is what the story
  * picker/player shell (step 5) and the dev chapter browser both read from.
+ *
+ * Chapters 1–11 are shared (same content regardless of route). Chapter 11
+ * is the route-split chapter itself (see manifest.inkwellAndIvyRouteSplit)
+ * — chapters 12+ will need a route-keyed structure instead of this flat
+ * map once they're written, since Kai-route and Ren-route chapter 12 are
+ * different content under the same chapter number.
  */
 export const inkwellAndIvyChapters: Record<number, Chapter> = {
   1: chapter01,
@@ -26,4 +33,5 @@ export const inkwellAndIvyChapters: Record<number, Chapter> = {
   8: chapter08,
   9: chapter09,
   10: chapter10,
+  11: chapter11,
 };

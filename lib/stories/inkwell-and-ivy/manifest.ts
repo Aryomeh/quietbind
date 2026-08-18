@@ -1,4 +1,16 @@
 import type { StoryManifest } from "@/lib/engine/types";
+import type { RouteSplitConfig } from "@/lib/engine/route";
+
+/** Ch.11 "Lila's Letters" decides the route: whichever of Kai/Ren has the
+ * higher affection total wins; a tie is broken by the Ch.9 festival-prep
+ * "who do you lean on" choice (docs/inkwell-and-ivy-STORY-OUTLINE.md). */
+export const inkwellAndIvyRouteSplit: RouteSplitConfig = {
+  chapter: 11,
+  candidates: [
+    { route: "kai", affectionKey: "kai", tiebreakerFlag: "ch9LeanedKai" },
+    { route: "ren", affectionKey: "ren", tiebreakerFlag: "ch9LeanedRen" },
+  ],
+};
 
 /**
  * Story manifest for Inkwell & Ivy — the reference implementation story.

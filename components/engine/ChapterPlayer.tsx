@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Chapter, StoryCharacter } from "@/lib/engine/types";
 import { useChapterPlayer } from "@/lib/engine/player";
+import { resolveLockedRoute, type RouteSplitConfig } from "@/lib/engine/route";
 import { DialogueBox } from "@/components/engine/DialogueBox";
 import { ChoiceButtons } from "@/components/engine/ChoiceButtons";
 import { AffectionHud } from "@/components/engine/AffectionHud";
@@ -20,19 +21,26 @@ interface ChapterPlayerProps {
   chapter: Chapter;
   characters: StoryCharacter[];
   initialAffection?: Record<string, number>;
+  initialFlags?: string[];
   /** Whether chapterNumber + 1 exists as written content — controls the "Continue" link after the ad. */
   hasNextChapter?: boolean;
+  /** This story's route-split config, if it has one — only used when
+   * chapter.chapterNumber matches routeSplit.chapter. */
+  routeSplit?: RouteSplitConfig;
 }
 
 export function ChapterPlayer({
   chapter,
   characters,
   initialAffection,
+  initialFlags,
   hasNextChapter = false,
+  routeSplit,
 }: ChapterPlayerProps) {
   const { currentNode, affection, flags, isComplete, advance, choose } = useChapterPlayer(
     chapter,
-    initialAffection
+    initialAffection,
+    initialFlags
   );
 
   // idle -> showing (ad pops on completion) -> done (ad dismissed, progress saved, next chapter unlocked)
@@ -50,11 +58,22 @@ export function ChapterPlayer({
       const session = await getSession();
       const userId = session?.user?.id ?? null;
       await ensurePlayer(deviceId, userId);
+
+      // Chapter's own `route` field is "shared" for every chapter through the
+      // route lock. Once the lock chapter itself finishes, the *saved* route
+      // switches to whichever character actually won — every chapter after
+      // reads that saved value to pick the right route variant. Below the
+      // lock chapter, the shared value is saved as-is.
+      const lockedRoute =
+        routeSplit && chapter.chapterNumber === routeSplit.chapter
+          ? resolveLockedRoute(affection, flags, routeSplit)
+          : chapter.route;
+
       await saveProgress(
         deviceId,
         chapter.storySlug,
         chapter.chapterNumber,
-        chapter.route,
+        lockedRoute,
         affection,
         Array.from(flags),
         userId
@@ -81,6 +100,12 @@ export function ChapterPlayer({
     if (adPhase === "done") audioManager.playSfx(SFX.adGateUnlock);
   }, [adPhase]);
 
+  const isRouteSplitChapter = routeSplit && chapter.chapterNumber === routeSplit.chapter;
+  const lockedRouteLabel =
+    isRouteSplitChapter && isComplete
+      ? characters.find((c) => c.id === resolveLockedRoute(affection, flags, routeSplit!))?.name
+      : null;
+
   return (
     <div className="flex min-h-screen flex-col bg-[#14171f] px-6 py-8">
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-between gap-6">
@@ -106,6 +131,11 @@ export function ChapterPlayer({
           {isComplete && adPhase === "done" && (
             <div className="rounded-2xl border border-[#caa14d]/30 bg-[#f6ecd6] px-6 py-8 text-center shadow-lg">
               <p className="font-semibold text-[#241d12]">End of chapter.</p>
+              {lockedRouteLabel && (
+                <p className="mt-2 text-sm text-[#5b5138]">
+                  Your path is set: <span className="font-semibold">{lockedRouteLabel}</span>
+                </p>
+              )}
               {hasNextChapter ? (
                 <Link
                   href={`/play/${chapter.storySlug}/${chapter.chapterNumber + 1}`}

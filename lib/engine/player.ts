@@ -29,11 +29,15 @@ function firstVisibleId(nodes: ChapterNode[], flags: Set<string>): string | null
  * the lib/engine/types.ts schema, so any story's chapter data can be
  * dropped in.
  */
-export function useChapterPlayer(chapter: Chapter, initialAffection: Record<string, number> = {}) {
-  const [flags, setFlags] = useState<Set<string>>(new Set());
+export function useChapterPlayer(
+  chapter: Chapter,
+  initialAffection: Record<string, number> = {},
+  initialFlags: string[] = []
+) {
+  const [flags, setFlags] = useState<Set<string>>(() => new Set(initialFlags));
   const [affection, setAffection] = useState<Record<string, number>>(initialAffection);
   const [currentId, setCurrentId] = useState<string | null>(() =>
-    firstVisibleId(chapter.nodes, new Set())
+    firstVisibleId(chapter.nodes, new Set(initialFlags))
   );
 
   const currentNode = useMemo(

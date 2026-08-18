@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-18 (Google sign-in wired up on /account, cross-device progress sync) · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-18 (Ch.11 route-split chapter written; engine now carries affection/flags across chapters and locks the route)· **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -36,17 +36,18 @@ components/engine/                      Shared VN engine UI — BUILT
 lib/supabase/                           Supabase integration — BUILT
   client.ts                             Browser client (env-var driven)
   device.ts                             Anonymous device-id (localStorage) + qb_players upsert; linkDeviceToUser() tags a device's rows with a signed-in user_id
-  progress.ts                           isChapterUnlocked / unlockChapter / saveProgress / getUnlockedChapters / getLastReadChapter — all now accept an optional userId so progress made on one device shows up on any other device signed into the same Google account
+  progress.ts                           isChapterUnlocked / unlockChapter / saveProgress / getUnlockedChapters / getLastReadChapter / getProgress — all accept an optional userId so progress made on one device shows up on any other device signed into the same Google account. getProgress() returns the full saved row (affection, flags, route) so the player page can carry that into the next chapter instead of starting fresh
   auth.ts                               signInWithGoogle / signOut / getSession / onAuthStateChange — thin wrapper over supabase.auth
 lib/engine/                             Engine internals — BUILT
   types.ts                              Platform-wide chapter data schema (Chapter, DialogueLine, ChoiceBlock, StoryManifest...)
-  player.ts                             useChapterPlayer — playback state machine (advance/choose, flags, affection, goto)
+  player.ts                             useChapterPlayer — playback state machine (advance/choose, flags, affection, goto); now accepts initialFlags as well as initialAffection so a chapter picks up where the last one left off
+  route.ts                              resolveLockedRoute() — story-agnostic route-split resolver: compares each candidate's affection total, ties broken by a tiebreaker flag. Used by ChapterPlayer whenever the current chapter matches a story's routeSplit.chapter
   __fixtures__/dummyChapter.ts          Test fixture, not story canon
 lib/stories/inkwell-and-ivy/            Chapter data for story #1
-  manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers — BUILT
-  chapter-01 through chapter-10.ts       "The Bell Above the Door" through "The Key" — BUILT (Ch.1-10 of 20, half done)
-  chapters.ts                           Chapter-number → Chapter map, read by the dev route (and eventually the picker)
-  chapters 11-20                        NOT YET WRITTEN — Ch.11 is the route-split chapter
+  manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers, inkwellAndIvyRouteSplit config (Kai vs Ren affection, Ch.9 flag tiebreaker) — BUILT
+  chapter-01 through chapter-11.ts       "The Bell Above the Door" through "Lila's Letters" — BUILT (Ch.1-11 of 20). Ch.11 is the route-split chapter: no Kai/Ren-swaying choice itself, route is decided by the affection totals carried in from Ch.1-10
+  chapters.ts                           Chapter-number → Chapter map (1-11, all shared). Chapters 12+ will need a route-keyed structure instead of this flat map, since Kai-route and Ren-route Ch.12 are different content under the same number — noted in the file but not built yet
+  chapters 12-20                        NOT YET WRITTEN — first route-specific content, doubles the writing workload per the outline's production notes
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app

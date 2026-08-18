@@ -104,6 +104,49 @@ export async function getLastReadChapter(
   return data?.chapter_number ?? null;
 }
 
+/** Full saved progress row for a story — affection totals, story flags, and
+ * the locked route (if any) — used to carry state forward into the next
+ * chapter instead of starting each chapter from zero. Checked across this
+ * device and, if signed in, every device tied to this account. Null if
+ * never played. */
+export interface SavedProgress {
+  chapterNumber: number;
+  route: string;
+  affection: Record<string, number>;
+  flags: string[];
+}
+
+export async function getProgress(
+  deviceId: string,
+  storySlug: string,
+  userId?: string | null
+): Promise<SavedProgress | null> {
+  if (!deviceId && !userId) return null;
+
+  let query = supabase
+    .from("qb_progress")
+    .select("chapter_number, route, affection, flags")
+    .eq("story_slug", storySlug);
+  query = userId
+    ? query.or(`device_id.eq.${deviceId},user_id.eq.${userId}`)
+    : query.eq("device_id", deviceId);
+
+  const { data, error } = await query.order("updated_at", { ascending: false }).limit(1).maybeSingle();
+
+  if (error) {
+    console.error("getProgress error", error);
+    return null;
+  }
+  if (!data) return null;
+
+  return {
+    chapterNumber: data.chapter_number,
+    route: data.route,
+    affection: (data.affection as Record<string, number>) ?? {},
+    flags: Object.keys((data.flags as Record<string, boolean>) ?? {}),
+  };
+}
+
 export async function saveProgress(
   deviceId: string,
   storySlug: string,
