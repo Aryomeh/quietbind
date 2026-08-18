@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-17 (audio settings toggles, Ch.4–10 written, em-dash cleanup) · **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-18 (Google sign-in wired up on /account, cross-device progress sync) · **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -24,7 +24,8 @@ a hard constraint, see §6).
 app/                                    Next.js app (App Router)
   page.tsx                              App entry sequence: splash (Wobblewing Studios logo) -> ~8s simulated loading (stalls at 50%/80%) -> main menu. Skips splash/loading on return trips to "/" via a sessionStorage flag — only plays on true first open per browser session.
   stories/                              Story picker (moved here from /) — lists all 7 stories, links to /play/inkwell-and-ivy/1
-  achievements/, settings/, account/    Placeholder screens off the main menu — not wired up, UI only (account has Google/Email sign-in placeholders); each has a "← Menu" back link
+  achievements/, settings/               Placeholder screens off the main menu — not wired up, UI only; each has a "← Menu" back link
+  account/                              Real Google sign-in via Supabase Auth OAuth (Email still a placeholder). Requires a Google OAuth Client ID configured in Supabase Auth > Providers, and the Vercel URL added to Supabase's allowed redirect URLs, before it works live.
   play/inkwell-and-ivy/[chapter]/       Real player route — checks Supabase unlock status before rendering; ChapterPlayer now also has a "← Menu" back link
   dev/engine-preview/                   Internal route: engine sanity-check against a dummy chapter
   dev/inkwell/[chapter]/                Internal route: plays any written Inkwell & Ivy chapter, e.g. /dev/inkwell/1
@@ -34,8 +35,9 @@ components/engine/                      Shared VN engine UI — BUILT
   DialogueBox.tsx, ChoiceButtons.tsx, AffectionHud.tsx, ChapterPlayer.tsx, AdGateModal.tsx
 lib/supabase/                           Supabase integration — BUILT
   client.ts                             Browser client (env-var driven)
-  device.ts                             Anonymous device-id (localStorage) + qb_players upsert
-  progress.ts                           isChapterUnlocked / unlockChapter / saveProgress
+  device.ts                             Anonymous device-id (localStorage) + qb_players upsert; linkDeviceToUser() tags a device's rows with a signed-in user_id
+  progress.ts                           isChapterUnlocked / unlockChapter / saveProgress / getUnlockedChapters / getLastReadChapter — all now accept an optional userId so progress made on one device shows up on any other device signed into the same Google account
+  auth.ts                               signInWithGoogle / signOut / getSession / onAuthStateChange — thin wrapper over supabase.auth
 lib/engine/                             Engine internals — BUILT
   types.ts                              Platform-wide chapter data schema (Chapter, DialogueLine, ChoiceBlock, StoryManifest...)
   player.ts                             useChapterPlayer — playback state machine (advance/choose, flags, affection, goto)

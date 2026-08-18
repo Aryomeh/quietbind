@@ -12,6 +12,7 @@ import { CharacterStage } from "@/components/engine/CharacterStage";
 import { AdGateModal } from "@/components/engine/AdGateModal";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
 import { saveProgress, unlockChapter } from "@/lib/supabase/progress";
+import { getSession } from "@/lib/supabase/auth";
 import { audioManager } from "@/lib/audio/AudioManager";
 import { getBgmForChapter, SFX } from "@/lib/audio/assets";
 
@@ -46,16 +47,19 @@ export function ChapterPlayer({
     (async () => {
       const deviceId = getOrCreateDeviceId();
       if (!deviceId) return;
-      await ensurePlayer(deviceId);
+      const session = await getSession();
+      const userId = session?.user?.id ?? null;
+      await ensurePlayer(deviceId, userId);
       await saveProgress(
         deviceId,
         chapter.storySlug,
         chapter.chapterNumber,
         chapter.route,
         affection,
-        Array.from(flags)
+        Array.from(flags),
+        userId
       );
-      await unlockChapter(deviceId, chapter.storySlug, chapter.chapterNumber + 1, "ad");
+      await unlockChapter(deviceId, chapter.storySlug, chapter.chapterNumber + 1, "ad", userId);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adPhase]);

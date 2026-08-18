@@ -7,6 +7,7 @@ import { inkwellAndIvyChapters } from "@/lib/stories/inkwell-and-ivy/chapters";
 import { inkwellAndIvyManifest } from "@/lib/stories/inkwell-and-ivy/manifest";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
 import { getUnlockedChapters, getLastReadChapter } from "@/lib/supabase/progress";
+import { getSession, onAuthStateChange } from "@/lib/supabase/auth";
 
 type LoadState = "loading" | "ready";
 
@@ -19,18 +20,40 @@ export default function InkwellAndIvyChapterPicker() {
     let cancelled = false;
     (async () => {
       const deviceId = getOrCreateDeviceId();
-      await ensurePlayer(deviceId);
+      const session = await getSession();
+      const userId = session?.user?.id ?? null;
+      await ensurePlayer(deviceId, userId);
       const [unlockedChapters, last] = await Promise.all([
-        getUnlockedChapters(deviceId, inkwellAndIvyManifest.slug),
-        getLastReadChapter(deviceId, inkwellAndIvyManifest.slug),
+        getUnlockedChapters(deviceId, inkwellAndIvyManifest.slug, userId),
+        getLastReadChapter(deviceId, inkwellAndIvyManifest.slug, userId),
       ]);
       if (cancelled) return;
       setUnlocked(unlockedChapters);
       setLastRead(last);
       setLoadState("ready");
     })();
+    // Re-run the same load whenever sign-in state changes (e.g. user signs
+    // in on another tab and comes back), so unlocks/progress from other
+    // devices show up without a manual refresh.
+    const unsubscribe = onAuthStateChange(() => {
+      setLoadState("loading");
+      (async () => {
+        const deviceId = getOrCreateDeviceId();
+        const session = await getSession();
+        const userId = session?.user?.id ?? null;
+        const [unlockedChapters, last] = await Promise.all([
+          getUnlockedChapters(deviceId, inkwellAndIvyManifest.slug, userId),
+          getLastReadChapter(deviceId, inkwellAndIvyManifest.slug, userId),
+        ]);
+        if (cancelled) return;
+        setUnlocked(unlockedChapters);
+        setLastRead(last);
+        setLoadState("ready");
+      })();
+    });
     return () => {
       cancelled = true;
+      unsubscribe();
     };
   }, []);
 

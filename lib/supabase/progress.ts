@@ -2,22 +2,28 @@
 
 import { supabase } from "@/lib/supabase/client";
 
-/** Chapter 1 of any story is always accessible; everything else needs a qb_unlocked_chapters row. */
+/** Chapter 1 of any story is always accessible; everything else needs a qb_unlocked_chapters row.
+ * Pass userId when signed in so an unlock made on another device also counts here. */
 export async function isChapterUnlocked(
   deviceId: string,
   storySlug: string,
-  chapterNumber: number
+  chapterNumber: number,
+  userId?: string | null
 ): Promise<boolean> {
   if (chapterNumber <= 1) return true;
-  if (!deviceId) return false;
+  if (!deviceId && !userId) return false;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("qb_unlocked_chapters")
     .select("chapter_number")
-    .eq("device_id", deviceId)
     .eq("story_slug", storySlug)
-    .eq("chapter_number", chapterNumber)
-    .maybeSingle();
+    .eq("chapter_number", chapterNumber);
+
+  query = userId
+    ? query.or(`device_id.eq.${deviceId},user_id.eq.${userId}`)
+    : query.eq("device_id", deviceId);
+
+  const { data, error } = await query.limit(1).maybeSingle();
 
   if (error) {
     console.error("isChapterUnlocked error", error);
@@ -30,29 +36,41 @@ export async function unlockChapter(
   deviceId: string,
   storySlug: string,
   chapterNumber: number,
-  method: "free" | "ad" | "iap" = "ad"
+  method: "free" | "ad" | "iap" = "ad",
+  userId?: string | null
 ): Promise<void> {
   if (!deviceId) return;
   const { error } = await supabase.from("qb_unlocked_chapters").upsert(
-    { device_id: deviceId, story_slug: storySlug, chapter_number: chapterNumber, unlock_method: method },
+    {
+      device_id: deviceId,
+      story_slug: storySlug,
+      chapter_number: chapterNumber,
+      unlock_method: method,
+      ...(userId ? { user_id: userId } : {}),
+    },
     { onConflict: "device_id,story_slug,chapter_number" }
   );
   if (error) console.error("unlockChapter error", error);
 }
 
-/** All chapter numbers this device has unlocked for a story (via qb_unlocked_chapters), used to build the chapter picker's lock/unlock state in one query instead of one per chapter. Chapter 1 is always implicitly unlocked and isn't stored as a row, so it's added here regardless of what's in the DB. */
+/** All chapter numbers this device (and, if signed in, this account across devices)
+ * has unlocked for a story, used to build the chapter picker's lock/unlock state in
+ * one query instead of one per chapter. Chapter 1 is always implicitly unlocked and
+ * isn't stored as a row, so it's added here regardless of what's in the DB. */
 export async function getUnlockedChapters(
   deviceId: string,
-  storySlug: string
+  storySlug: string,
+  userId?: string | null
 ): Promise<Set<number>> {
   const unlocked = new Set<number>([1]);
-  if (!deviceId) return unlocked;
+  if (!deviceId && !userId) return unlocked;
 
-  const { data, error } = await supabase
-    .from("qb_unlocked_chapters")
-    .select("chapter_number")
-    .eq("device_id", deviceId)
-    .eq("story_slug", storySlug);
+  let query = supabase.from("qb_unlocked_chapters").select("chapter_number").eq("story_slug", storySlug);
+  query = userId
+    ? query.or(`device_id.eq.${deviceId},user_id.eq.${userId}`)
+    : query.eq("device_id", deviceId);
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("getUnlockedChapters error", error);
@@ -62,19 +80,22 @@ export async function getUnlockedChapters(
   return unlocked;
 }
 
-/** The chapter this device most recently saved progress on for a story — used for the picker's "Continue" shortcut. Null if they've never played this story. */
+/** The chapter most recently saved for a story, checked across this device and,
+ * if signed in, every device tied to this account — used for the picker's
+ * "Continue" shortcut. Null if never played. */
 export async function getLastReadChapter(
   deviceId: string,
-  storySlug: string
+  storySlug: string,
+  userId?: string | null
 ): Promise<number | null> {
-  if (!deviceId) return null;
+  if (!deviceId && !userId) return null;
 
-  const { data, error } = await supabase
-    .from("qb_progress")
-    .select("chapter_number")
-    .eq("device_id", deviceId)
-    .eq("story_slug", storySlug)
-    .maybeSingle();
+  let query = supabase.from("qb_progress").select("chapter_number").eq("story_slug", storySlug);
+  query = userId
+    ? query.or(`device_id.eq.${deviceId},user_id.eq.${userId}`)
+    : query.eq("device_id", deviceId);
+
+  const { data, error } = await query.order("updated_at", { ascending: false }).limit(1).maybeSingle();
 
   if (error) {
     console.error("getLastReadChapter error", error);
@@ -89,7 +110,8 @@ export async function saveProgress(
   chapterNumber: number,
   route: string,
   affection: Record<string, number>,
-  flags: string[]
+  flags: string[],
+  userId?: string | null
 ): Promise<void> {
   if (!deviceId) return;
   const flagsObj = Object.fromEntries(flags.map((f) => [f, true]));
@@ -102,6 +124,7 @@ export async function saveProgress(
       affection,
       flags: flagsObj,
       updated_at: new Date().toISOString(),
+      ...(userId ? { user_id: userId } : {}),
     },
     { onConflict: "device_id,story_slug" }
   );

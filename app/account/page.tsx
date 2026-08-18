@@ -1,7 +1,35 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Mail, LogOut } from "lucide-react";
+import type { Session } from "@supabase/supabase-js";
+import { getOrCreateDeviceId, linkDeviceToUser } from "@/lib/supabase/device";
+import { signInWithGoogle, signOut, getSession, onAuthStateChange } from "@/lib/supabase/auth";
 
 export default function AccountPage() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getSession().then((s) => {
+      setSession(s);
+      setLoading(false);
+    });
+    const unsubscribe = onAuthStateChange(async (s) => {
+      setSession(s);
+      if (s?.user) {
+        const deviceId = getOrCreateDeviceId();
+        await linkDeviceToUser(deviceId, s.user.id);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleGoogleSignIn = () => {
+    signInWithGoogle(`${window.location.origin}/account`);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#14171f] px-6 text-[#e8d9b0]">
       <div className="w-full max-w-sm">
@@ -10,41 +38,60 @@ export default function AccountPage() {
         </Link>
 
         <div className="mt-8 text-center">
-          <h1 className="text-2xl font-semibold">Sign in</h1>
+          <h1 className="text-2xl font-semibold">
+            {session ? "Signed in" : "Sign in"}
+          </h1>
           <p className="mt-2 text-sm text-[#e8d9b0]/50">
             Sync your progress across devices. Not required to play.
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3">
-          <button
-            type="button"
-            disabled
-            className="flex items-center justify-center gap-3 rounded-xl border border-[#e8d9b0]/15 bg-[#1a1d27] px-5 py-3.5 text-sm font-medium text-[#e8d9b0]/80 opacity-70"
-          >
-            <GoogleGlyph />
-            Continue with Google
-          </button>
+        {!loading && !session && (
+          <div className="mt-8 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="flex items-center justify-center gap-3 rounded-xl border border-[#e8d9b0]/15 bg-[#1a1d27] px-5 py-3.5 text-sm font-medium text-[#e8d9b0]/80 transition hover:bg-[#1a1d27]/70"
+            >
+              <GoogleGlyph />
+              Continue with Google
+            </button>
 
-          <button
-            type="button"
-            disabled
-            className="flex items-center justify-center gap-3 rounded-xl border border-[#e8d9b0]/15 bg-[#1a1d27] px-5 py-3.5 text-sm font-medium text-[#e8d9b0]/80 opacity-70"
-          >
-            <Mail size={18} />
-            Continue with Email
-          </button>
-        </div>
+            <button
+              type="button"
+              disabled
+              className="flex items-center justify-center gap-3 rounded-xl border border-[#e8d9b0]/15 bg-[#1a1d27] px-5 py-3.5 text-sm font-medium text-[#e8d9b0]/80 opacity-70"
+            >
+              <Mail size={18} />
+              Continue with Email
+            </button>
+          </div>
+        )}
+
+        {!loading && session && (
+          <div className="mt-8">
+            <button
+              type="button"
+              onClick={() => signOut()}
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#e8d9b0]/15 bg-[#1a1d27] px-5 py-3.5 text-sm font-medium text-[#e8d9b0]/80 transition hover:bg-[#1a1d27]/70"
+            >
+              <LogOut size={18} />
+              Sign out
+            </button>
+          </div>
+        )}
 
         <p className="mt-6 text-center text-xs text-[#e8d9b0]/30">
-          Sign-in isn&apos;t wired up yet — placeholder only.
+          {session ? "" : "Email sign-in isn't wired up yet — placeholder only."}
         </p>
 
         <div className="mt-8 rounded-xl border border-[#e8d9b0]/10 bg-[#1a1d27] px-5 py-4 text-center">
           <p className="text-xs uppercase tracking-[0.2em] text-[#e8d9b0]/40">
             Currently playing as
           </p>
-          <p className="mt-1 text-sm text-[#e8d9b0]/70">Guest (this device only)</p>
+          <p className="mt-1 text-sm text-[#e8d9b0]/70">
+            {session?.user?.email ?? "Guest (this device only)"}
+          </p>
         </div>
       </div>
     </main>
