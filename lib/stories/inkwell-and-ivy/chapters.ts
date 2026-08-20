@@ -11,7 +11,9 @@ import { chapter09 } from "@/lib/stories/inkwell-and-ivy/chapter-09";
 import { chapter10 } from "@/lib/stories/inkwell-and-ivy/chapter-10";
 import { chapter11 } from "@/lib/stories/inkwell-and-ivy/chapter-11";
 import { chapter12Kai } from "@/lib/stories/inkwell-and-ivy/routes/kai/chapter-12";
+import { chapter13Kai } from "@/lib/stories/inkwell-and-ivy/routes/kai/chapter-13";
 import { chapter12Ren } from "@/lib/stories/inkwell-and-ivy/routes/ren/chapter-12";
+import { chapter13Ren } from "@/lib/stories/inkwell-and-ivy/routes/ren/chapter-13";
 
 /**
  * Chapters 1-11: shared, same content regardless of route (Ch.11 is the
@@ -42,9 +44,11 @@ export const inkwellAndIvySharedChapters: Record<number, Chapter> = {
 export const inkwellAndIvyRouteChapters: Record<string, Record<number, Chapter>> = {
   kai: {
     12: chapter12Kai,
+    13: chapter13Kai,
   },
   ren: {
     12: chapter12Ren,
+    13: chapter13Ren,
   },
 };
 
