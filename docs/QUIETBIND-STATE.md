@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-20 (Ch.13 "Thorne's Offer" written for both routes)· **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-20 (Ch.14 "Festival Eve" written for both routes)· **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -47,8 +47,8 @@ lib/stories/inkwell-and-ivy/            Chapter data for story #1
   manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers, inkwellAndIvyRouteSplit config (Kai vs Ren affection, Ch.9 flag tiebreaker) — BUILT
   chapter-01 through chapter-11.ts       "The Bell Above the Door" through "Lila's Letters" — BUILT (Ch.1-11 of 20). Ch.11 is the route-split chapter: no Kai/Ren-swaying choice itself, route is decided by the affection totals carried in from Ch.1-10
   chapters.ts                           Now exports inkwellAndIvySharedChapters (1-11, flat map) + inkwellAndIvyRouteChapters (route -> chapter number -> Chapter, for 12+) + getInkwellAndIvyChapter(num, route) / hasNextInkwellAndIvyChapter(num, route) lookup helpers that both player-facing pages use instead of indexing a map directly. Old inkwellAndIvyChapters export kept as a deprecated alias for inkwellAndIvySharedChapters (only the dev browser without a route param still touches it indirectly)
-  routes/kai/chapter-12.ts, chapter-13.ts, routes/ren/chapter-12.ts, chapter-13.ts   Route-specific chapter data — BUILT (see §9 steps 13-14)
-  chapters 14-20                        NOT YET WRITTEN — remaining route-specific content, doubles the writing workload per the outline's production notes
+  routes/kai/chapter-12.ts, chapter-13.ts, chapter-14.ts, routes/ren/chapter-12.ts, chapter-13.ts, chapter-14.ts   Route-specific chapter data — BUILT (see §9 steps 13-15)
+  chapters 15-20                        NOT YET WRITTEN — remaining route-specific content, doubles the writing workload per the outline's production notes
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app
@@ -321,6 +321,20 @@ Ch. 1–11).
    Thorne). No em-dashes, no doubled hedge phrasing, checked against the
    existing style rule before pushing.
 
+15. ✅ **Ch.14 "Festival Eve" for both routes.** Night before the Autumn
+   Festival, both routes build to a near-confession that gets interrupted
+   before it lands (a burst of laughter across the square on Kai's route,
+   a slammed car door on Ren's), deliberately not resolving here per the
+   outline. Kai route: a slow walk-and-talk around the square, quiet and
+   reflective, Kai references something Lila once said about the shop
+   being an excuse for people to stay long enough for "the actual thing"
+   to happen. Ren route: a lighter, banter-heavy late-night booth-prep
+   session, flour-on-the-face bit leads into the same kind of charged
+   pause, keeping his usual teasing voice right up until the moment gets
+   serious. Both set a flag on the player's choice of how they meet the
+   moment (lean in / hold back) for a possible later payoff. Style rule
+   checked before pushing, same as prior chapters.
+
 **Immediate next step:** app is live and confirmed reachable at
 https://quietbind-git-main-aryomehs-projects.vercel.app/ (Vercel
 Deployment Protection was initially blocking outside access — user
@@ -332,15 +346,16 @@ stalls). **Not yet done:** a real click-through of the ad-gate ->
 Supabase unlock -> Chapter 2 sequence hasn't been explicitly confirmed
 working by the user — worth asking about specifically.
 
-Story writing is now the main active thread: Ch.1-13 of 20 are done (11
-shared + Ch.12-13 written for both routes). Next chapters to write are
-**Ch.14 "Festival Eve"** for both routes (Kai: a slow, quiet walk-and-talk,
-near-confession interrupted; Ren: prepping the booth together late into
-the night, lighter and banter-heavy, also a near-confession). Route-keyed
-infrastructure is fully proven now across two chapters, so each new route
-chapter just needs a new file under
-`lib/stories/inkwell-and-ivy/routes/<route>/chapter-NN.ts` plus an entry
-in `inkwellAndIvyRouteChapters`.
+Story writing is now the main active thread: Ch.1-14 of 20 are done (11
+shared + Ch.12-14 written for both routes). Next chapters to write are
+**Ch.15 "The Autumn Festival"** for both routes (the big set-piece: the
+shop's booth, built back in Ch.9, either lands or struggles depending on
+earlier choices, plus a public confrontation with a Thorne associate, and
+per the mystery thread's touchpoint table, an attempt to stall the booth
+that later traces back to Elias). Route-keyed infrastructure is fully
+proven now across three chapters, so each new route chapter just needs a
+new file under `lib/stories/inkwell-and-ivy/routes/<route>/chapter-NN.ts`
+plus an entry in `inkwellAndIvyRouteChapters`.
 
 **Style notes for any AI writing chapter text**, learned mid-session:
 - No em-dashes ("—") in any `text` field the player will see. Use
