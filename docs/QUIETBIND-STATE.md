@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-18 (Ch.11 route-split chapter written; engine now carries affection/flags across chapters and locks the route)· **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-20 (route-keyed chapter structure built; Ch.12 written for both Kai and Ren routes)· **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -46,8 +46,9 @@ lib/engine/                             Engine internals — BUILT
 lib/stories/inkwell-and-ivy/            Chapter data for story #1
   manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers, inkwellAndIvyRouteSplit config (Kai vs Ren affection, Ch.9 flag tiebreaker) — BUILT
   chapter-01 through chapter-11.ts       "The Bell Above the Door" through "Lila's Letters" — BUILT (Ch.1-11 of 20). Ch.11 is the route-split chapter: no Kai/Ren-swaying choice itself, route is decided by the affection totals carried in from Ch.1-10
-  chapters.ts                           Chapter-number → Chapter map (1-11, all shared). Chapters 12+ will need a route-keyed structure instead of this flat map, since Kai-route and Ren-route Ch.12 are different content under the same number — noted in the file but not built yet
-  chapters 12-20                        NOT YET WRITTEN — first route-specific content, doubles the writing workload per the outline's production notes
+  chapters.ts                           Now exports inkwellAndIvySharedChapters (1-11, flat map) + inkwellAndIvyRouteChapters (route -> chapter number -> Chapter, for 12+) + getInkwellAndIvyChapter(num, route) / hasNextInkwellAndIvyChapter(num, route) lookup helpers that both player-facing pages use instead of indexing a map directly. Old inkwellAndIvyChapters export kept as a deprecated alias for inkwellAndIvySharedChapters (only the dev browser without a route param still touches it indirectly)
+  routes/kai/chapter-12.ts, routes/ren/chapter-12.ts   Route-specific chapter data — BUILT (see §9 step 13)
+  chapters 13-20                        NOT YET WRITTEN — remaining route-specific content, doubles the writing workload per the outline's production notes
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app
@@ -286,6 +287,25 @@ Ch. 1–11).
      ("like it's not planning on being ignored"). Only `text` fields
      changed — no ids/flags/choice logic touched.
 
+13. ✅ **Route-keyed chapter structure + Ch.12 for both routes.** `lib/engine/route.ts`'s
+   `resolveLockedRoute()` already picked the winning route at Ch.11 completion, but
+   `chapters.ts` had no way to store two different chapters under the same number. Now:
+   `inkwellAndIvySharedChapters` (1-11) stays a flat map; a new `inkwellAndIvyRouteChapters`
+   is keyed `route -> chapterNumber -> Chapter`; `getInkwellAndIvyChapter(num, route)` and
+   `hasNextInkwellAndIvyChapter(num, route)` are the single lookup point every consumer now
+   uses. Updated: `/play/inkwell-and-ivy/[chapter]` (chapter resolution now waits on saved
+   progress before resolving for chapters past 11, to avoid a false "chapter doesn't exist"
+   flash), `/stories/inkwell-and-ivy` (chapter list only shows route chapters once
+   `getProgress()` returns an actual locked route), `/dev/inkwell/[chapter]` (now takes an
+   optional `?route=kai`/`?route=ren` query param for previewing route chapters directly,
+   since that route has no real Supabase progress to read a route from).
+   **Ch.12 written for both routes:** Kai route "A Quiet Understanding" (he admits the
+   library-book notes were half for Lila, half for whoever came after) and Ren route
+   "Recipe for Trouble" (he teaches the player his family's old recipe, tied to the
+   storefront Thorne's company cost them). Both follow the established em-dash-free style
+   rule and existing character voice; one affection choice each, both set a flag for a
+   later payoff callback if needed. Neither route's Ch.13-20 exist yet.
+
 **Immediate next step:** app is live and confirmed reachable at
 https://quietbind-git-main-aryomehs-projects.vercel.app/ (Vercel
 Deployment Protection was initially blocking outside access — user
@@ -297,15 +317,14 @@ stalls). **Not yet done:** a real click-through of the ad-gate ->
 Supabase unlock -> Chapter 2 sequence hasn't been explicitly confirmed
 working by the user — worth asking about specifically.
 
-Story writing is now the main active thread: Ch.1-10 of 20 are done
-(exactly halfway to the Ch.11 route split). Next chapter to write is
-**Ch.11 "The Choice"** — the actual route-split chapter, branching to
-`route: "kai"` or `route: "ren"` based on total affection (tiebreaker:
-the Ch.9 festival-prep choice flag). This is a bigger lift than Ch.4-10
-since it needs the branch logic itself (not just flag-gated dialogue
-lines within one linear chapter) — check how `player.ts` and
-`ChapterPlayer` currently resolve `route` before writing it, since nothing
-route-specific has been built yet.
+Story writing is now the main active thread: Ch.1-12 of 20 are done (11
+shared + Ch.12 written for both routes). Next chapters to write are
+**Ch.13 "Thorne's Offer"** for both routes (Thorne makes a personal buyout
+pitch; Kai's reaction is quiet but pointed, Ren's is far more openly
+angry). Route-keyed infrastructure is now in place (`chapters.ts`,
+see step 13 above) so each new route chapter just needs a new file under
+`lib/stories/inkwell-and-ivy/routes/<route>/chapter-NN.ts` plus an entry
+in `inkwellAndIvyRouteChapters`.
 
 **Style notes for any AI writing chapter text**, learned mid-session:
 - No em-dashes ("—") in any `text` field the player will see. Use
