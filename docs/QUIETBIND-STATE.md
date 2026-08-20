@@ -1,5 +1,5 @@
 # QUIETBIND — Platform State
-**Last updated:** 2026-08-20 (route-keyed chapter structure built; Ch.12 written for both Kai and Ren routes)· **Repo:** https://github.com/Aryomeh/quietbind (public)
+**Last updated:** 2026-08-20 (Ch.13 "Thorne's Offer" written for both routes)· **Repo:** https://github.com/Aryomeh/quietbind (public)
 **Owner:** Ayobami (GitHub: `doxxedghostman` / `Aryomeh`) · Publishing entity: D&D Interiors and Construction Ltd (RC 9006178)
 
 > This file is the canonical, current-state summary of the Quietbind project.
@@ -47,8 +47,8 @@ lib/stories/inkwell-and-ivy/            Chapter data for story #1
   manifest.ts                           Cast, route lock (Ch.11), 6 ending tiers, inkwellAndIvyRouteSplit config (Kai vs Ren affection, Ch.9 flag tiebreaker) — BUILT
   chapter-01 through chapter-11.ts       "The Bell Above the Door" through "Lila's Letters" — BUILT (Ch.1-11 of 20). Ch.11 is the route-split chapter: no Kai/Ren-swaying choice itself, route is decided by the affection totals carried in from Ch.1-10
   chapters.ts                           Now exports inkwellAndIvySharedChapters (1-11, flat map) + inkwellAndIvyRouteChapters (route -> chapter number -> Chapter, for 12+) + getInkwellAndIvyChapter(num, route) / hasNextInkwellAndIvyChapter(num, route) lookup helpers that both player-facing pages use instead of indexing a map directly. Old inkwellAndIvyChapters export kept as a deprecated alias for inkwellAndIvySharedChapters (only the dev browser without a route param still touches it indirectly)
-  routes/kai/chapter-12.ts, routes/ren/chapter-12.ts   Route-specific chapter data — BUILT (see §9 step 13)
-  chapters 13-20                        NOT YET WRITTEN — remaining route-specific content, doubles the writing workload per the outline's production notes
+  routes/kai/chapter-12.ts, chapter-13.ts, routes/ren/chapter-12.ts, chapter-13.ts   Route-specific chapter data — BUILT (see §9 steps 13-14)
+  chapters 14-20                        NOT YET WRITTEN — remaining route-specific content, doubles the writing workload per the outline's production notes
 lib/stories/<other 6 slugs>/            Folders exist, no chapter data yet
 public/assets/stories/<slug>/{characters,backgrounds}/  Folders exist, no art yet — CSS/SVG chibi
                                          placeholders only exist in the old standalone HTML prototype, not in this app
@@ -306,6 +306,21 @@ Ch. 1–11).
    rule and existing character voice; one affection choice each, both set a flag for a
    later payoff callback if needed. Neither route's Ch.13-20 exist yet.
 
+14. ✅ **Ch.13 "Thorne's Offer" for both routes.** Thorne makes his personal
+   buyout pitch directly to the player, in person this time rather than by
+   letter. Kai route: he stays quiet and controlled through the pitch, then
+   afterward admits carefully that he has a stake in what happens, the
+   closest he's come to naming the relationship outright. Ren route: he goes
+   openly angry mid-pitch, his family's history resurfacing, then apologizes
+   after and opens up further about watching his grandmother sign the old
+   papers. Both routes share the same player choice shape (shut it down /
+   stay measured) and both land the mystery thread's second "sabotage"
+   incident at the end: the ledger moved again, a page corner folded down at
+   the shop's original ownership records, timed right after Thorne's visit
+   per the outline's Ch.13 touchpoint (suspicion peaks, red herring toward
+   Thorne). No em-dashes, no doubled hedge phrasing, checked against the
+   existing style rule before pushing.
+
 **Immediate next step:** app is live and confirmed reachable at
 https://quietbind-git-main-aryomehs-projects.vercel.app/ (Vercel
 Deployment Protection was initially blocking outside access — user
@@ -317,12 +332,13 @@ stalls). **Not yet done:** a real click-through of the ad-gate ->
 Supabase unlock -> Chapter 2 sequence hasn't been explicitly confirmed
 working by the user — worth asking about specifically.
 
-Story writing is now the main active thread: Ch.1-12 of 20 are done (11
-shared + Ch.12 written for both routes). Next chapters to write are
-**Ch.13 "Thorne's Offer"** for both routes (Thorne makes a personal buyout
-pitch; Kai's reaction is quiet but pointed, Ren's is far more openly
-angry). Route-keyed infrastructure is now in place (`chapters.ts`,
-see step 13 above) so each new route chapter just needs a new file under
+Story writing is now the main active thread: Ch.1-13 of 20 are done (11
+shared + Ch.12-13 written for both routes). Next chapters to write are
+**Ch.14 "Festival Eve"** for both routes (Kai: a slow, quiet walk-and-talk,
+near-confession interrupted; Ren: prepping the booth together late into
+the night, lighter and banter-heavy, also a near-confession). Route-keyed
+infrastructure is fully proven now across two chapters, so each new route
+chapter just needs a new file under
 `lib/stories/inkwell-and-ivy/routes/<route>/chapter-NN.ts` plus an entry
 in `inkwellAndIvyRouteChapters`.
 
