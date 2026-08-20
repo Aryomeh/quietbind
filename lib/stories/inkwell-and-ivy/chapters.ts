@@ -1,4 +1,4 @@
-import type { Chapter } from "@/lib/engine/types";
+import type { Chapter, RouteId } from "@/lib/engine/types";
 import { chapter01 } from "@/lib/stories/inkwell-and-ivy/chapter-01";
 import { chapter02 } from "@/lib/stories/inkwell-and-ivy/chapter-02";
 import { chapter03 } from "@/lib/stories/inkwell-and-ivy/chapter-03";
@@ -10,19 +10,15 @@ import { chapter08 } from "@/lib/stories/inkwell-and-ivy/chapter-08";
 import { chapter09 } from "@/lib/stories/inkwell-and-ivy/chapter-09";
 import { chapter10 } from "@/lib/stories/inkwell-and-ivy/chapter-10";
 import { chapter11 } from "@/lib/stories/inkwell-and-ivy/chapter-11";
+import { chapter12Kai } from "@/lib/stories/inkwell-and-ivy/routes/kai/chapter-12";
+import { chapter12Ren } from "@/lib/stories/inkwell-and-ivy/routes/ren/chapter-12";
 
 /**
- * All Inkwell & Ivy chapters written so far, keyed by chapter number.
- * Add new chapters here as they're written — this is what the story
- * picker/player shell (step 5) and the dev chapter browser both read from.
- *
- * Chapters 1–11 are shared (same content regardless of route). Chapter 11
- * is the route-split chapter itself (see manifest.inkwellAndIvyRouteSplit)
- * — chapters 12+ will need a route-keyed structure instead of this flat
- * map once they're written, since Kai-route and Ren-route chapter 12 are
- * different content under the same chapter number.
+ * Chapters 1-11: shared, same content regardless of route (Ch.11 is the
+ * route-split chapter itself, see manifest.inkwellAndIvyRouteSplit).
+ * Keyed by chapter number, same as before the route split existed.
  */
-export const inkwellAndIvyChapters: Record<number, Chapter> = {
+export const inkwellAndIvySharedChapters: Record<number, Chapter> = {
   1: chapter01,
   2: chapter02,
   3: chapter03,
@@ -35,3 +31,46 @@ export const inkwellAndIvyChapters: Record<number, Chapter> = {
   10: chapter10,
   11: chapter11,
 };
+
+/**
+ * Chapters 12+: route-specific. Kai-route and Ren-route chapter 12 are
+ * different Chapter objects that happen to share a chapter number, so they
+ * can't live in one flat Record<number, Chapter> the way 1-11 do. Keyed
+ * first by route, then by chapter number. Add new route chapters here as
+ * they're written.
+ */
+export const inkwellAndIvyRouteChapters: Record<string, Record<number, Chapter>> = {
+  kai: {
+    12: chapter12Kai,
+  },
+  ren: {
+    12: chapter12Ren,
+  },
+};
+
+/**
+ * Single lookup a player-facing page can call without caring whether a
+ * chapter is shared or route-locked. `route` should be the player's
+ * *saved* route (from SavedProgress.route) once past Ch.11, "shared" or
+ * undefined is fine for chapters 1-11, which ignore it.
+ */
+export function getInkwellAndIvyChapter(
+  chapterNumber: number,
+  route?: RouteId | null
+): Chapter | undefined {
+  if (chapterNumber <= 11) return inkwellAndIvySharedChapters[chapterNumber];
+  if (!route || route === "shared") return undefined;
+  return inkwellAndIvyRouteChapters[route]?.[chapterNumber];
+}
+
+/** True if chapterNumber + 1 exists for this route, drives the "Continue" link after the ad. */
+export function hasNextInkwellAndIvyChapter(chapterNumber: number, route?: RouteId | null): boolean {
+  return getInkwellAndIvyChapter(chapterNumber + 1, route) !== undefined;
+}
+
+/**
+ * @deprecated Chapters 1-11 only, kept for the dev chapter browser, which
+ * plays chapters outside the normal progress flow and has no saved route to
+ * look up. Do not use for chapters 12+; use getInkwellAndIvyChapter instead.
+ */
+export const inkwellAndIvyChapters = inkwellAndIvySharedChapters;

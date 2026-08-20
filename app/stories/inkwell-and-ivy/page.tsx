@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Lock, ArrowLeft } from "lucide-react";
-import { inkwellAndIvyChapters } from "@/lib/stories/inkwell-and-ivy/chapters";
+import { inkwellAndIvySharedChapters, inkwellAndIvyRouteChapters, getInkwellAndIvyChapter } from "@/lib/stories/inkwell-and-ivy/chapters";
 import { inkwellAndIvyManifest } from "@/lib/stories/inkwell-and-ivy/manifest";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
-import { getUnlockedChapters, getLastReadChapter } from "@/lib/supabase/progress";
+import { getUnlockedChapters, getLastReadChapter, getProgress } from "@/lib/supabase/progress";
 import { getSession, onAuthStateChange } from "@/lib/supabase/auth";
 
 type LoadState = "loading" | "ready";
@@ -15,41 +15,35 @@ export default function InkwellAndIvyChapterPicker() {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [unlocked, setUnlocked] = useState<Set<number>>(new Set([1]));
   const [lastRead, setLastRead] = useState<number | null>(null);
+  // Route the player locked into at Ch.11 — undefined until they've saved
+  // progress past the route split. Chapters 12+ only exist once this is set.
+  const [route, setRoute] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const load = async () => {
       const deviceId = getOrCreateDeviceId();
       const session = await getSession();
       const userId = session?.user?.id ?? null;
       await ensurePlayer(deviceId, userId);
-      const [unlockedChapters, last] = await Promise.all([
+      const [unlockedChapters, last, progress] = await Promise.all([
         getUnlockedChapters(deviceId, inkwellAndIvyManifest.slug, userId),
         getLastReadChapter(deviceId, inkwellAndIvyManifest.slug, userId),
+        getProgress(deviceId, inkwellAndIvyManifest.slug, userId),
       ]);
       if (cancelled) return;
       setUnlocked(unlockedChapters);
       setLastRead(last);
+      setRoute(progress?.route ?? null);
       setLoadState("ready");
-    })();
+    };
+    load();
     // Re-run the same load whenever sign-in state changes (e.g. user signs
     // in on another tab and comes back), so unlocks/progress from other
     // devices show up without a manual refresh.
     const unsubscribe = onAuthStateChange(() => {
       setLoadState("loading");
-      (async () => {
-        const deviceId = getOrCreateDeviceId();
-        const session = await getSession();
-        const userId = session?.user?.id ?? null;
-        const [unlockedChapters, last] = await Promise.all([
-          getUnlockedChapters(deviceId, inkwellAndIvyManifest.slug, userId),
-          getLastReadChapter(deviceId, inkwellAndIvyManifest.slug, userId),
-        ]);
-        if (cancelled) return;
-        setUnlocked(unlockedChapters);
-        setLastRead(last);
-        setLoadState("ready");
-      })();
+      load();
     });
     return () => {
       cancelled = true;
@@ -57,9 +51,15 @@ export default function InkwellAndIvyChapterPicker() {
     };
   }, []);
 
-  const writtenChapterNumbers = Object.keys(inkwellAndIvyChapters)
-    .map(Number)
-    .sort((a, b) => a - b);
+  // Shared chapters (1-11) always show. Route chapters (12+) only show once
+  // the player has an actual locked route, so a fresh player never sees a
+  // Kai/Ren chapter list before Ch.11 resolves it for them.
+  const writtenChapterNumbers = [
+    ...Object.keys(inkwellAndIvySharedChapters).map(Number),
+    ...(route && inkwellAndIvyRouteChapters[route]
+      ? Object.keys(inkwellAndIvyRouteChapters[route]).map(Number)
+      : []),
+  ].sort((a, b) => a - b);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#14171f] px-6 py-12 text-[#e8d9b0]">
@@ -73,7 +73,7 @@ export default function InkwellAndIvyChapterPicker() {
         </p>
         <h1 className="mt-1 text-2xl font-semibold">Chapters</h1>
 
-        {loadState === "ready" && lastRead && inkwellAndIvyChapters[lastRead] && (
+        {loadState === "ready" && lastRead && getInkwellAndIvyChapter(lastRead, route) && (
           <Link
             href={`/play/inkwell-and-ivy/${lastRead}`}
             className="mt-4 block rounded-xl border border-[#caa14d]/50 bg-[#1f2330] px-5 py-3 text-sm font-medium text-[#e8d9b0] hover:border-[#caa14d]"
@@ -84,7 +84,8 @@ export default function InkwellAndIvyChapterPicker() {
 
         <div className="mt-6 flex flex-col gap-3">
           {writtenChapterNumbers.map((num) => {
-            const chapter = inkwellAndIvyChapters[num];
+            const chapter = getInkwellAndIvyChapter(num, route);
+            if (!chapter) return null;
             const isUnlocked = loadState === "ready" && unlocked.has(num);
             return (
               <div

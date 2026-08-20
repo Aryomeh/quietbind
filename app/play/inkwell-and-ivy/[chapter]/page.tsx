@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChapterPlayer } from "@/components/engine/ChapterPlayer";
-import { inkwellAndIvyChapters } from "@/lib/stories/inkwell-and-ivy/chapters";
+import { getInkwellAndIvyChapter, hasNextInkwellAndIvyChapter } from "@/lib/stories/inkwell-and-ivy/chapters";
 import { inkwellAndIvyManifest, inkwellAndIvyRouteSplit } from "@/lib/stories/inkwell-and-ivy/manifest";
 import { getOrCreateDeviceId, ensurePlayer } from "@/lib/supabase/device";
 import { isChapterUnlocked, getProgress, type SavedProgress } from "@/lib/supabase/progress";
@@ -15,13 +15,21 @@ type Status = "loading" | "locked" | "unlocked";
 export default function PlayInkwellChapterPage() {
   const params = useParams<{ chapter: string }>();
   const chapterNumber = Number(params.chapter);
-  const chapter = inkwellAndIvyChapters[chapterNumber];
 
   const [status, setStatus] = useState<Status>("loading");
   const [progress, setProgress] = useState<SavedProgress | null>(null);
 
+  // Below the route lock (Ch.1-11) every player sees the same content, so
+  // the chapter can resolve before progress loads. Past Ch.11 it depends on
+  // the player's saved route, so it resolves once `progress` comes back.
+  const chapter =
+    chapterNumber <= 11
+      ? getInkwellAndIvyChapter(chapterNumber)
+      : progress
+      ? getInkwellAndIvyChapter(chapterNumber, progress.route)
+      : undefined;
+
   useEffect(() => {
-    if (!chapter) return;
     let cancelled = false;
     (async () => {
       const deviceId = getOrCreateDeviceId();
@@ -29,8 +37,8 @@ export default function PlayInkwellChapterPage() {
       const userId = session?.user?.id ?? null;
       await ensurePlayer(deviceId, userId);
       const [unlocked, saved] = await Promise.all([
-        isChapterUnlocked(deviceId, chapter.storySlug, chapter.chapterNumber, userId),
-        getProgress(deviceId, chapter.storySlug, userId),
+        isChapterUnlocked(deviceId, "inkwell-and-ivy", chapterNumber, userId),
+        getProgress(deviceId, "inkwell-and-ivy", userId),
       ]);
       if (cancelled) return;
       setProgress(saved);
@@ -39,7 +47,18 @@ export default function PlayInkwellChapterPage() {
     return () => {
       cancelled = true;
     };
-  }, [chapter]);
+  }, [chapterNumber]);
+
+  // For chapters past the route lock, `chapter` can't resolve until
+  // `progress` loads (it depends on progress.route) — check loading first,
+  // or a route-locked chapter would flash "doesn't exist yet" every time.
+  if (status === "loading") {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#14171f] text-[#e8d9b0]/60">
+        <p>Loading…</p>
+      </main>
+    );
+  }
 
   if (!chapter) {
     return (
@@ -48,14 +67,6 @@ export default function PlayInkwellChapterPage() {
         <Link href="/" className="text-sm text-[#caa14d] underline">
           Back to stories
         </Link>
-      </main>
-    );
-  }
-
-  if (status === "loading") {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#14171f] text-[#e8d9b0]/60">
-        <p>Loading…</p>
       </main>
     );
   }
@@ -83,7 +94,7 @@ export default function PlayInkwellChapterPage() {
       characters={inkwellAndIvyManifest.characters}
       initialAffection={progress?.affection}
       initialFlags={progress?.flags}
-      hasNextChapter={!!inkwellAndIvyChapters[chapterNumber + 1]}
+      hasNextChapter={hasNextInkwellAndIvyChapter(chapterNumber, progress?.route)}
       routeSplit={inkwellAndIvyRouteSplit}
     />
   );
